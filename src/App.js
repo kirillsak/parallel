@@ -1,17 +1,21 @@
 import React, { createRef } from 'react'
 import {
-  Container,
   Dimmer,
   Loader,
   Grid,
-  Sticky,
   Message,
+  //Sticky,
+  Container,
 } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 
 import { SubstrateContextProvider, useSubstrateState } from './substrate-lib'
 import { DeveloperConsole } from './substrate-lib/components'
-
+import AuthComponent from './components/Authorisation.jsx'
+import { UserProvider } from './components/UserContext'
+import Interactor from './Interactor'
+import BalancesSection from './components/BalancesSection'
+/*
 import AccountSelector from './AccountSelector'
 import Balances from './Balances'
 import BlockNumber from './BlockNumber'
@@ -22,6 +26,7 @@ import NodeInfo from './NodeInfo'
 import TemplateModule from './TemplateModule'
 import Transfer from './Transfer'
 import Upgrade from './Upgrade'
+*/
 
 function Main() {
   const { apiState, apiError, keyringState } = useSubstrateState()
@@ -59,33 +64,14 @@ function Main() {
 
   return (
     <div ref={contextRef}>
-      <Sticky context={contextRef}>
-        <AccountSelector />
-      </Sticky>
       <Container>
         <Grid stackable columns="equal">
-          <Grid.Row stretched>
-            <NodeInfo />
-            <Metadata />
-            <BlockNumber />
-            <BlockNumber finalized />
-          </Grid.Row>
-          <Grid.Row stretched>
-            <Balances />
-          </Grid.Row>
-          <Grid.Row>
-            <Transfer />
-            <Upgrade />
-          </Grid.Row>
-          <Grid.Row>
-            <Interactor />
-            <Events />
-          </Grid.Row>
-          <Grid.Row>
-            <TemplateModule />
-          </Grid.Row>
+          <Interactor />
+          <AuthComponent />
+          <BalancesSection />
         </Grid>
       </Container>
+
       <DeveloperConsole />
     </div>
   )
@@ -93,8 +79,12 @@ function Main() {
 
 export default function App() {
   return (
-    <SubstrateContextProvider>
-      <Main />
-    </SubstrateContextProvider>
+    <UserProvider>
+      <div style={{ backgroundColor: 'black', height: '100vh' }}>
+        <SubstrateContextProvider>
+          <Main />
+        </SubstrateContextProvider>
+      </div>
+    </UserProvider>
   )
 }
