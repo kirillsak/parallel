@@ -4,7 +4,10 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 // import { ApiPromise, WsProvider } from "@polkadot/api";
 import React, { useState, useEffect } from "react";
-import { List, ListItem, ListItemText } from "@mui/material";
+import { List, ListItemButton, ListItemText } from "@mui/material";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import FolderIcon from "@mui/icons-material/Folder";
 
 const apiResponse = [
   [
@@ -123,9 +126,14 @@ function AdminsCard(props) {
         <Box>
           <List>
             {items.map((item, index) => (
-              <ListItem key={index}>
+              <ListItemButton key={index} sx={{ borderRadius: '50px' }}>
+                <ListItemAvatar>
+                  <Avatar>
+                    <FolderIcon />
+                  </Avatar>
+                </ListItemAvatar>
                 <ListItemText primary={item} />
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </Box>
