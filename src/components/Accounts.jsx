@@ -32,7 +32,7 @@ function Accounts() {
     <div
       style={{
         backgroundColor: "white",
-        color: "black",
+        color: "white",
         padding: "20px",
         borderRadius: "5px",
         boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
