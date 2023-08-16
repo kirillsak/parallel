@@ -33,6 +33,7 @@ import Interactor from './Interactor'
 import BalancesSection from './components/BalancesSection'
 import { Stack } from '@mui/material';
 import TreasuryBalancesSection from './components/TreasuryBalancesSection';
+import AdminsCard from './components/AdminsCard';
 /*
 import AccountSelector from './AccountSelector'
 import Balances from './Balances'
@@ -234,6 +235,7 @@ function Main() {
             <BalancesSection />
             <SupplyCard />
             <TreasuryBalancesSection />
+            <AdminsCard />
           </Box>
         </Box>
 
