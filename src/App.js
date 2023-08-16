@@ -230,12 +230,12 @@ function Main() {
             }}
           >
             <Toolbar />
-            <Interactor />
             <AuthComponent />
             <BalancesSection />
             <SupplyCard />
             <TreasuryBalancesSection />
             <AdminsCard />
+            <Interactor />
           </Box>
         </Box>
 
