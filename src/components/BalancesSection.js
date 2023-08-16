@@ -1,5 +1,6 @@
 import { Box, Card, Grid, Stack } from '@mui/material'
 import Typography from '@mui/material/Typography'
+import NativeBalanceCard from './NativeBalanceCard'
 import BalanceCard from './BalanceCard'
 import React, { useState, useEffect } from 'react'
 
@@ -60,10 +61,10 @@ function BalancesSection() {
       <Box>
         <Grid container spacing={2}>
           <Grid item>
-            <BalanceCard address={userAddress} />
+            <NativeBalanceCard address={userAddress} />
           </Grid>
           <Grid item>
-            <BalanceCard address="5Ddp6n9jhVnLFf54ahWENTNZregypej8Zy18a4PtJs1iQsXy" />
+            <BalanceCard address={userAddress} />
           </Grid>
         </Grid>
       </Box>

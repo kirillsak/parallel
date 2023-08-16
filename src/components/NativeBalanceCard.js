@@ -57,7 +57,7 @@ function Body({ balance, tokenAbbreviation }) {
   );
 }
 
-function BalanceCard(props) {
+function NativeBalanceCard(props) {
   const [balance, setBalance] = useState(null);
   const [api, setApi] = useState(null);
 
@@ -80,27 +80,18 @@ function BalanceCard(props) {
       if (!api) return; // Ensure the API is set before fetching
 
       const accountAddress = props.address; // Using address to fetch balance
-      // const assetId = 0;
 
       try {
-        const result = await api.query.assets.account(0, accountAddress);
-        console.log(result);
-        console.log("Full result:", JSON.stringify(result, null, 2));
-        console.log("Type of result:", typeof result);
-        console.log("Type of result.balance:", typeof result.balance);
+        const result = await api.query.system.account(accountAddress);
+        console.log("Account result:", result);
 
-
-        if (result && result.balance !== undefined) { // Check if balance is not undefined
-          const humanReadableBalance = (typeof result.balance.toHuman === 'function')
-            ? result.balance.toHuman()
-            : result.balance.toString(); // If toHuman isn't available, just convert the balance to string
-
+        if (result && result.data && result.data.free) {
+          const humanReadableBalance = result.data.free.toHuman();
           setBalance(humanReadableBalance);
         } else {
           console.warn(
             "Unable to retrieve the 'free' balance or the result is unexpected."
           );
-
         }
       } catch (error) {
         console.error("Error fetching account balance:", error);
@@ -133,4 +124,4 @@ function BalanceCard(props) {
   );
 }
 
-export default BalanceCard;
+export default NativeBalanceCard;
