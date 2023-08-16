@@ -32,6 +32,7 @@ import { UserProvider } from './components/UserContext'
 import Interactor from './Interactor'
 import BalancesSection from './components/BalancesSection'
 import { Stack } from '@mui/material';
+import TreasuryBalancesSection from './components/TreasuryBalancesSection';
 /*
 import AccountSelector from './AccountSelector'
 import Balances from './Balances'
@@ -232,6 +233,7 @@ function Main() {
             <AuthComponent />
             <BalancesSection />
             <SupplyCard />
+            <TreasuryBalancesSection />
           </Box>
         </Box>
 

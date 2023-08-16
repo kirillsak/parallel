@@ -58,7 +58,7 @@ function Body({ balance, tokenAbbreviation }) {
 }
 
 function BalanceCard(props) {
-  const [balance, setBalance] = useState(null);
+  const [balance, setBalance] = useState(0);
   const [api, setApi] = useState(null);
 
   useEffect(() => {
