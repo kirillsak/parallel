@@ -12,16 +12,16 @@ import { Divider } from "semantic-ui-react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
 
-const apiResponse = [
-  [
-    [0, "5FH7TJCApjJ3x79xfYe83M2a1LUbHtWkzhnq2GvN8kZq7FQT"],
-    null
-  ],
-  [
-    [0, "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"],
-    null
-  ]
-];
+// const apiResponse = [
+//   [
+//     [0, "5FH7TJCApjJ3x79xfYe83M2a1LUbHtWkzhnq2GvN8kZq7FQT"],
+//     null
+//   ],
+//   [
+//     [0, "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"],
+//     null
+//   ]
+// ];
 
 function Header({ tokenLogo, tokenName }) {
   return (
@@ -67,14 +67,30 @@ function AdminsCard(props) {
   const [api, setApi] = useState(null);
   const [items, setItems] = useState([]);
 
-
   useEffect(() => {
-    const extractedItems = apiResponse.map(result => result[0][1]);
-    console.log(extractedItems);
-    setItems(extractedItems);
-  }, []); // Empty dependency array to run only once
+    const fetchCommunityHead = async () => {
+      if (!api) return; // Ensure the API is set before fetching
 
+      const communityId = 0;
 
+      try {
+        const result = await api.query.communities.admins(communityId);
+        console.log(result);
+        console.log("Community Full result:", JSON.stringify(result, null, 2));
+        const jsonResult = result.toJSON();
+        console.log(jsonResult);
+
+        const extractedItems = jsonResult.map(result => result[0][1]);
+        console.log(extractedItems);
+        setItems(extractedItems);
+
+      } catch (error) {
+        console.error("Error fetching fund account:", error);
+      }
+    };
+
+    fetchCommunityHead();
+  }, [api]);
 
   useEffect(() => {
     const setupApi = async () => {
@@ -140,32 +156,7 @@ function AdminsCard(props) {
   //   };
   // }, []);
 
-  // useEffect(() => {
-  //   const fetchBalance = async () => {
-  //     if (!api) return; // Ensure the API is set before fetching
 
-  //     const accountAddress = props.address; // Using address to fetch balance
-
-  //     try {
-  //       const result = await api.query.system.account(accountAddress);
-  //       console.log("Account result:", result);
-  //       console.log("Account Full result:", JSON.stringify(result, null, 2));
-
-  //       if (result && result.data && result.data.free) {
-  //         const humanReadableBalance = result.data.free.toHuman();
-  //         setBalance(humanReadableBalance);
-  //       } else {
-  //         console.warn(
-  //           "Unable to retrieve the 'free' balance or the result is unexpected."
-  //         );
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching account balance:", error);
-  //     }
-  //   };
-
-  //   fetchBalance();
-  // }, [props.address, api]);
   return (
     <Card sx={{ backgroundColor: "#171717", borderRadius: "30px" }}>
       <Box
