@@ -23,7 +23,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { mainListItems } from './components/listItems';
 import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
-
+import SupplyCard from './components/SupplyCard';
 
 import { SubstrateContextProvider, useSubstrateState } from './substrate-lib'
 import { DeveloperConsole } from './substrate-lib/components'
@@ -231,6 +231,7 @@ function Main() {
             <Interactor />
             <AuthComponent />
             <BalancesSection />
+            <SupplyCard />
           </Box>
         </Box>
 

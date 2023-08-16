@@ -7,29 +7,40 @@ import React, { useState, useEffect } from "react";
 
 function Header({ tokenLogo, tokenName }) {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "nowrap",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        gap: 1.5,
-      }}
-    >
-      <Box>
-        <img
-          src={tokenLogo}
-          alt={tokenName}
-          className="balancecard-token-logo"
-          width="32"
-          height="32"
-        />
-      </Box>
-      <Box>
-        <Typography variant="h2" component="h2" sx={{ fontSize: "1.5rem" }}>
-          {tokenName}
+    <Box>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Typography variant="h1" component="h1" sx={{ fontSize: "2.5rem" }}>
+          Supply
         </Typography>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "nowrap",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          gap: 1.5,
+        }}
+      >
+        <Box>
+          <img
+            src={tokenLogo}
+            alt={tokenName}
+            className="balancecard-token-logo"
+            width="32"
+            height="32"
+          />
+        </Box>
+        <Box>
+          <Typography variant="h2" component="h2" sx={{ fontSize: "1.5rem" }}>
+            {tokenName}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
@@ -57,7 +68,7 @@ function Body({ balance, tokenAbbreviation }) {
   );
 }
 
-function NativeBalanceCard(props) {
+function SupplyCard(props) {
   const [balance, setBalance] = useState(null);
   const [api, setApi] = useState(null);
 
@@ -79,20 +90,27 @@ function NativeBalanceCard(props) {
     const fetchBalance = async () => {
       if (!api) return; // Ensure the API is set before fetching
 
-      const accountAddress = props.address; // Using address to fetch balance
+      const assetId = 0;
 
       try {
-        const result = await api.query.system.account(accountAddress);
-        console.log("Account result:", result);
-        console.log("Account Full result:", JSON.stringify(result, null, 2));
+        const result = await api.query.assets.asset(assetId);
+        console.log(result);
+        console.log("Full result:", JSON.stringify(result, null, 2));
+        console.log("Type of result:", typeof result);
+        console.log("Type of result.balance:", typeof result.balance);
 
-        if (result && result.data && result.data.free) {
-          const humanReadableBalance = result.data.free.toHuman();
+
+        if (result && result.balance !== undefined) { // Check if balance is not undefined
+          const humanReadableBalance = (typeof result.balance.toHuman === 'function')
+            ? result.balance.toHuman()
+            : result.balance.toString(); // If toHuman isn't available, just convert the balance to string
+
           setBalance(humanReadableBalance);
         } else {
           console.warn(
             "Unable to retrieve the 'free' balance or the result is unexpected."
           );
+
         }
       } catch (error) {
         console.error("Error fetching account balance:", error);
@@ -125,4 +143,4 @@ function NativeBalanceCard(props) {
   );
 }
 
-export default NativeBalanceCard;
+export default SupplyCard;
