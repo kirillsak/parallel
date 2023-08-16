@@ -34,7 +34,7 @@ function BalancesSection() {
     <Stack spacing={2} padding={1} direction="row">
       <Card
         sx={{
-          backgroundColor: 'white',
+          backgroundColor: '#BED7A8',
           padding: '5px 15px 5px 15px',
           borderRadius: '25px',
           minWidth: '170px',

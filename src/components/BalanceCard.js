@@ -22,6 +22,8 @@ function Header({ tokenLogo, tokenName }) {
           src={tokenLogo}
           alt={tokenName}
           className="balancecard-token-logo"
+          width="32"
+          height="32"
         />
       </Box>
       <Box>
