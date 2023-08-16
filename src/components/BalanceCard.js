@@ -88,14 +88,28 @@ function BalanceCard(props) {
         console.log("Full result:", JSON.stringify(result, null, 2));
         console.log("Type of result:", typeof result);
         console.log("Type of result.balance:", typeof result.balance);
+        console.log(Object.prototype.hasOwnProperty.call(result, 'balance'));
+        // for (const key in result) {
+        //   console.log(key, result[key]);
+        // }
+        let proto = Object.getPrototypeOf(result);
+        while (proto) {
+          console.log(proto);
+          proto = Object.getPrototypeOf(proto);
+        }
+        const jsonResult = result.toJSON();
+        console.log(jsonResult);
+        console.log(jsonResult.balance);
+        console.log("Type of jsonResult.balance:", typeof jsonResult.balance);
 
 
-        if (result && result.balance !== undefined) { // Check if balance is not undefined
-          const humanReadableBalance = (typeof result.balance.toHuman === 'function')
-            ? result.balance.toHuman()
-            : result.balance.toString(); // If toHuman isn't available, just convert the balance to string
 
-          setBalance(humanReadableBalance);
+        if (jsonResult && jsonResult.balance !== undefined) { // Check if balance is not undefined
+          // const humanReadableBalance = (typeof result.balance.toHuman === 'function')
+          //   ? result.balance.toHuman()
+          //   : result.balance.toString(); // If toHuman isn't available, just convert the balance to string
+
+          setBalance(jsonResult.balance);
         } else {
           console.warn(
             "Unable to retrieve the 'free' balance or the result is unexpected."

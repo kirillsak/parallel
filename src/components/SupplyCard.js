@@ -10,11 +10,11 @@ function Header({ tokenLogo, tokenName }) {
     <Box>
       <Box
         display="flex"
-        justifyContent="center"
+        justifyContent="flex-start"
         alignItems="center"
       >
         <Typography variant="h1" component="h1" sx={{ fontSize: "2.5rem" }}>
-          Supply
+          Token Supply
         </Typography>
       </Box>
       <Box
@@ -22,7 +22,7 @@ function Header({ tokenLogo, tokenName }) {
           display: "flex",
           flexDirection: "row",
           flexWrap: "nowrap",
-          justifyContent: "flex-start",
+          justifyContent: "center",
           alignItems: "center",
           gap: 1.5,
         }}
@@ -54,7 +54,7 @@ function Body({ balance, tokenAbbreviation }) {
       justifyContent={"center"}
       alignItems={"baseline"}
     >
-      <Grid item>
+      <Grid item sx={{ marginLeft: 5, }}>
         <Typography variant="h4" component="h3" sx={{ fontSize: "3rem" }}>
           {balance}
         </Typography>
@@ -97,15 +97,19 @@ function SupplyCard(props) {
         console.log(result);
         console.log("Full result:", JSON.stringify(result, null, 2));
         console.log("Type of result:", typeof result);
-        console.log("Type of result.balance:", typeof result.balance);
+        console.log("Type of result.balance:", typeof result["supply"]);
+        const jsonResult = result.toJSON();
+        console.log(jsonResult);
+        console.log(jsonResult.supply);
+        console.log("Type of jsonResult.balance:", typeof jsonResult.supply);
 
 
-        if (result && result.balance !== undefined) { // Check if balance is not undefined
-          const humanReadableBalance = (typeof result.balance.toHuman === 'function')
-            ? result.balance.toHuman()
-            : result.balance.toString(); // If toHuman isn't available, just convert the balance to string
+        if (jsonResult && jsonResult.supply !== undefined) { // Check if balance is not undefined
+          // const humanReadableBalance = (typeof result.balance.toHuman === 'function')
+          //   ? result.balance.toHuman()
+          //   : result.balance.toString(); // If toHuman isn't available, just convert the balance to string
 
-          setBalance(humanReadableBalance);
+          setBalance(jsonResult.supply);
         } else {
           console.warn(
             "Unable to retrieve the 'free' balance or the result is unexpected."
