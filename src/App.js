@@ -19,11 +19,10 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import MenuIcon from '@mui/icons-material/Menu';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import { mainListItems } from './components/listItems';
 import Card from '@mui/material/Card';
+import Button from '@mui/material/Button';
 
 
 import { SubstrateContextProvider, useSubstrateState } from './substrate-lib'
@@ -32,6 +31,7 @@ import AuthComponent from './components/Authorisation.jsx'
 import { UserProvider } from './components/UserContext'
 import Interactor from './Interactor'
 import BalancesSection from './components/BalancesSection'
+import { Stack } from '@mui/material';
 /*
 import AccountSelector from './AccountSelector'
 import Balances from './Balances'
@@ -195,11 +195,10 @@ function Main() {
                   </Typography>
                 </Card>
               </Container>
-              <IconButton color="inherit">
-                <Badge badgeContent={4} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
+              <Stack direction="row" spacing={2}>
+                <Button variant="outlined" sx={{ borderRadius: '50px' }}>Sign Up</Button>
+                <Button variant="contained" sx={{ borderRadius: '50px' }}>Log In</Button>
+              </Stack>
             </Toolbar>
           </AppBar>
           <Drawer variant="permanent" open={open}>
