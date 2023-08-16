@@ -68,28 +68,34 @@ function AdminsCard(props) {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    const fetchCommunityHead = async () => {
+    const fetchCommunityAdmins = async () => {
       if (!api) return; // Ensure the API is set before fetching
 
       const communityId = 0;
 
       try {
-        const result = await api.query.communities.admins(communityId);
-        console.log(result);
-        console.log("Community Full result:", JSON.stringify(result, null, 2));
-        const jsonResult = result.toJSON();
-        console.log(jsonResult);
+        const allKeys = await api.query.communities.admins.keys(communityId);
+        console.log("Community Keys", allKeys);
+        const adminAccountIds = allKeys.map(({ args: [, accountId] }) => accountId.toString());
+        console.log("Admin Account Ids", adminAccountIds);
 
-        const extractedItems = jsonResult.map(result => result[0][1]);
-        console.log(extractedItems);
-        setItems(extractedItems);
+        // const adminAccountIds = allKeys.map(({ args: [, accountId] }) => accountId);
+        // const result = await api.query.communities.admins(communityId);
+        // console.log(result);
+        // console.log("Community Full result:", JSON.stringify(result, null, 2));
+        // const jsonResult = result.toJSON();
+        // console.log(jsonResult);
+
+        // const extractedItems = jsonResult.map(result => result[0][1]);
+        // console.log(extractedItems);
+        setItems(adminAccountIds);
 
       } catch (error) {
         console.error("Error fetching fund account:", error);
       }
     };
 
-    fetchCommunityHead();
+    fetchCommunityAdmins();
   }, [api]);
 
   useEffect(() => {
