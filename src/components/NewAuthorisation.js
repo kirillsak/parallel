@@ -9,6 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
 
 function AuthComponent2() {
   const [initiateSignup, setInitiateSignup] = useState(false);
@@ -23,6 +24,7 @@ function AuthComponent2() {
   const { setLoggedInUser } = useUser();
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogType, setDialogType] = useState('login'); // 'login' or 'signup'
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = async () => {
     try {
@@ -32,6 +34,7 @@ function AuthComponent2() {
       });
       setLoggedInUser(username);
       setMessage(response.data.message);
+      setIsLoggedIn(true); // Update the logged-in state
       // Handle successful login here. Store tokens, navigate, etc.
     } catch (error) {
       setMessage(error.response.data.message);
@@ -95,12 +98,18 @@ function AuthComponent2() {
 
   return (
     <div>
-      <Button variant="contained" color="primary" onClick={handleOpenLogin}>
-        Login
-      </Button>
-      <Button variant="contained" color="secondary" onClick={handleOpenSignup}>
-        Signup
-      </Button>
+      {isLoggedIn ? (
+        <Avatar>{username.charAt(0).toUpperCase()}</Avatar> // Display an avatar with the first character of the username
+      ) : (
+        <>
+          <Button variant="contained" color="primary" onClick={handleOpenLogin}>
+            Login
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleOpenSignup}>
+            Signup
+          </Button>
+        </>
+      )}
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>{dialogType === 'login' ? 'Login' : 'Signup'}</DialogTitle>
