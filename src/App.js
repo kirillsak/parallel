@@ -34,7 +34,7 @@ import { SubstrateContextProvider, useSubstrateState } from './substrate-lib'
 import { DeveloperConsole } from './substrate-lib/components'
 // import AuthComponent from './components/Authorisation.jsx'
 import { UserProvider } from './components/UserContext'
-// import Interactor from './Interactor'
+import Interactor from './Interactor'
 import BalancesSection from './components/BalancesSection'
 // import { Stack } from '@mui/material';
 import TreasuryBalancesSection from './components/TreasuryBalancesSection';
@@ -108,11 +108,11 @@ const defaultTheme = createTheme({
       contrastText: '#FFFFFF',
     },
     error: {
-      main: '#d3eaf3',
+      main: '#FF0000',
       contrastText: '#FFFFFF',
     },
     warning: {
-      main: '#d3eaf3',
+      main: '#FF0000',
       contrastText: '#FFFFFF',
     },
     text: {
@@ -266,7 +266,7 @@ function Main() {
             <SupplyCard />
             <TreasuryBalancesSection />
             <AdminsCard />
-            {/* <Interactor /> */}
+            <Interactor />
           </Box>
         </Box>
 

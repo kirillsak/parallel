@@ -8,6 +8,7 @@ function AccountCreator() {
 
   const createAccount = () => {
     const keyring = new Keyring({ type: "sr25519" });
+    // const keyring = new Keyring({ type: "sr25519", ss58Format: 42069 });
 
     const newMnemonic = mnemonicGenerate();
     const pair = keyring.addFromUri(newMnemonic, { name: name }, "ed25519"); // Add the name as meta

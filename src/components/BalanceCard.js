@@ -84,23 +84,23 @@ function BalanceCard(props) {
 
       try {
         const result = await api.query.assets.account(0, accountAddress);
-        console.log(result);
-        console.log("Full result:", JSON.stringify(result, null, 2));
-        console.log("Type of result:", typeof result);
-        console.log("Type of result.balance:", typeof result.balance);
-        console.log(Object.prototype.hasOwnProperty.call(result, 'balance'));
+        // console.log(result);
+        // console.log("Full result:", JSON.stringify(result, null, 2));
+        // console.log("Type of result:", typeof result);
+        // console.log("Type of result.balance:", typeof result.balance);
+        // console.log(Object.prototype.hasOwnProperty.call(result, 'balance'));
         // for (const key in result) {
         //   console.log(key, result[key]);
         // }
-        let proto = Object.getPrototypeOf(result);
-        while (proto) {
-          console.log(proto);
-          proto = Object.getPrototypeOf(proto);
-        }
+        // let proto = Object.getPrototypeOf(result);
+        // while (proto) {
+        //   console.log(proto);
+        //   proto = Object.getPrototypeOf(proto);
+        // }
         const jsonResult = result.toJSON();
-        console.log(jsonResult);
-        console.log(jsonResult.balance);
-        console.log("Type of jsonResult.balance:", typeof jsonResult.balance);
+        // console.log(jsonResult);
+        // console.log(jsonResult.balance);
+        // console.log("Type of jsonResult.balance:", typeof jsonResult.balance);
 
 
 

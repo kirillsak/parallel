@@ -83,8 +83,8 @@ function NativeBalanceCard(props) {
 
       try {
         const result = await api.query.system.account(accountAddress);
-        console.log("Account result:", result);
-        console.log("Account Full result:", JSON.stringify(result, null, 2));
+        // console.log("Account result:", result);
+        // console.log("Account Full result:", JSON.stringify(result, null, 2));
 
         if (result && result.data && result.data.free) {
           const humanReadableBalance = result.data.free.toHuman();

@@ -94,14 +94,14 @@ function SupplyCard(props) {
 
       try {
         const result = await api.query.assets.asset(assetId);
-        console.log(result);
-        console.log("Full result:", JSON.stringify(result, null, 2));
-        console.log("Type of result:", typeof result);
-        console.log("Type of result.balance:", typeof result["supply"]);
+        // console.log(result);
+        // console.log("Full result:", JSON.stringify(result, null, 2));
+        // console.log("Type of result:", typeof result);
+        // console.log("Type of result.balance:", typeof result["supply"]);
         const jsonResult = result.toJSON();
-        console.log(jsonResult);
-        console.log(jsonResult.supply);
-        console.log("Type of jsonResult.balance:", typeof jsonResult.supply);
+        // console.log(jsonResult);
+        // console.log(jsonResult.supply);
+        // console.log("Type of jsonResult.balance:", typeof jsonResult.supply);
 
 
         if (jsonResult && jsonResult.supply !== undefined) { // Check if balance is not undefined

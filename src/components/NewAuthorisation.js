@@ -10,6 +10,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
+// import { useSubstrate } from '../substrate-lib'
 
 function AuthComponent2() {
   const [initiateSignup, setInitiateSignup] = useState(false);
@@ -26,6 +27,11 @@ function AuthComponent2() {
   const [dialogType, setDialogType] = useState('login'); // 'login' or 'signup'
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // const {
+  //   setCurrentAccount,
+  //   state: { keyring, currentAccount },
+  // } = useSubstrate()
+
   const handleLogin = async () => {
     try {
       const response = await axios.post("http://localhost:3001/login", {
@@ -36,10 +42,17 @@ function AuthComponent2() {
       setMessage(response.data.message);
       setIsLoggedIn(true); // Update the logged-in state
       // Handle successful login here. Store tokens, navigate, etc.
+      // const response2 = await axios.get(
+      //   `http://localhost:3001/getAddress/${username}`
+      // )
+      // const address = response2.data.address
+      // setCurrentAccount(keyring.getPair(address))
+      // console.log("Current Account is: ", currentAccount)
     } catch (error) {
       setMessage(error.response.data.message);
     }
   };
+
 
   const handleSignup = async () => {
     try {
@@ -102,10 +115,10 @@ function AuthComponent2() {
         <Avatar>{username.charAt(0).toUpperCase()}</Avatar> // Display an avatar with the first character of the username
       ) : (
         <>
-          <Button variant="contained" color="primary" onClick={handleOpenLogin}>
+          <Button variant="contained" sx={{ borderRadius: '50px' }} color="primary" onClick={handleOpenLogin}>
             Login
           </Button>
-          <Button variant="contained" color="secondary" onClick={handleOpenSignup}>
+          <Button variant="outlined" sx={{ borderRadius: '50px' }} onClick={handleOpenSignup}>
             Signup
           </Button>
         </>
@@ -119,6 +132,7 @@ function AuthComponent2() {
             label="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            inputProps={{ style: { color: 'black' } }}
           />
           {dialogType === 'signup' && (
             <TextField
@@ -127,6 +141,7 @@ function AuthComponent2() {
               label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              inputProps={{ style: { color: 'black' } }}
             />
           )}
           <TextField
@@ -135,6 +150,7 @@ function AuthComponent2() {
             label="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            inputProps={{ style: { color: 'black' } }}
           />
           <Typography color="error">
             {message}

@@ -10,6 +10,17 @@ import Avatar from "@mui/material/Avatar";
 import FolderIcon from "@mui/icons-material/Folder";
 import { Divider } from "semantic-ui-react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
+import { TxButton } from "../substrate-lib/components";
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { useUser } from './UserContext'
+import axios from 'axios'
+import { useSubstrate } from '../substrate-lib'
 
 
 // const apiResponse = [
@@ -37,6 +48,89 @@ function Header({ tokenLogo, tokenName }) {
   );
 }
 
+function FormDialog() {
+  const [open, setOpen] = React.useState(false);
+  const [status, setStatus] = useState(null)
+  const [userAddress, setUserAddress] = useState('')
+  const { loggedInUser } = useUser()
+  const {
+    setCurrentAccount,
+    state: { keyring, currentAccount },
+  } = useSubstrate()
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    const fetchUserAddress = async () => {
+      try {
+        console.log(`Fetching address for user: ${loggedInUser}`)
+
+        if (loggedInUser) {
+          console.log(loggedInUser)
+          const response = await axios.get(
+            `http://localhost:3001/getAddress/${loggedInUser}`
+          )
+          setUserAddress(response.data.address)
+        }
+      } catch (error) {
+        console.error('Failed to fetch address:', error)
+      }
+    }
+
+    fetchUserAddress()
+  }, [loggedInUser])
+
+  useEffect(() => {
+    if (userAddress && !currentAccount) {
+      setCurrentAccount(userAddress);
+      console.log(`Set current account to ${userAddress}`)
+    }
+  }, [currentAccount, setCurrentAccount, keyring, userAddress])
+
+
+  return (
+    <div>
+      <Button variant="outlined" onClick={handleClickOpen}>
+        Open form dialog
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Subscribe</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To subscribe to this website, please enter your email address here. We
+            will send updates occasionally.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Subscribe</Button>
+          <TxButton label="Submit" setStatus={setStatus} type="SIGNED-TX" attrs={{
+            palletRpc: 'communities',
+            callable: 'transfer',
+            inputParams: [0, 0],
+            paramFields: [true, true],
+          }} />
+          <div style={{ overflowWrap: 'break-word' }}>{status}</div>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+}
 
 // function Body({ balance, tokenAbbreviation }) {
 //   return (
@@ -67,6 +161,7 @@ function AdminsCard(props) {
   const [api, setApi] = useState(null);
   const [items, setItems] = useState([]);
 
+
   useEffect(() => {
     const fetchCommunityAdmins = async () => {
       if (!api) return; // Ensure the API is set before fetching
@@ -75,9 +170,9 @@ function AdminsCard(props) {
 
       try {
         const allKeys = await api.query.communities.admins.keys(communityId);
-        console.log("Community Keys", allKeys);
+        // console.log("Community Keys", allKeys);
         const adminAccountIds = allKeys.map(({ args: [, accountId] }) => accountId.toString());
-        console.log("Admin Account Ids", adminAccountIds);
+        // console.log("Admin Account Ids", adminAccountIds);
 
         // const adminAccountIds = allKeys.map(({ args: [, accountId] }) => accountId);
         // const result = await api.query.communities.admins(communityId);
@@ -120,12 +215,12 @@ function AdminsCard(props) {
 
       try {
         const result = await api.query.communities.communities(communityId);
-        console.log(result);
-        console.log("Community Full result:", JSON.stringify(result, null, 2));
+        // console.log(result);
+        // console.log("Community Full result:", JSON.stringify(result, null, 2));
         const jsonResult = result.toJSON();
-        console.log(jsonResult);
-        console.log(jsonResult.head);
-        console.log("Type of jsonResult.fund:", typeof jsonResult.head);
+        // console.log(jsonResult);
+        // console.log(jsonResult.head);
+        // console.log("Type of jsonResult.fund:", typeof jsonResult.head);
 
         if (jsonResult && jsonResult.head !== undefined) { // Check if balance is not undefined
           // const humanReadableBalance = (typeof result.balance.toHuman === 'function')
@@ -222,7 +317,12 @@ function AdminsCard(props) {
             ))}
           </List>
         </Box>
+        <Divider />
+        <Box>
+          <FormDialog />
+        </Box>
       </Box>
+
     </Card>
   );
 }

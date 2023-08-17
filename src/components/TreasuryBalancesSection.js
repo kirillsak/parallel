@@ -34,12 +34,12 @@ function TreasuryBalancesSection() {
 
       try {
         const result = await api.query.communities.communities(communityId);
-        console.log(result);
-        console.log("Community Full result:", JSON.stringify(result, null, 2));
+        // console.log(result);
+        // console.log("Community Full result:", JSON.stringify(result, null, 2));
         const jsonResult = result.toJSON();
-        console.log(jsonResult);
-        console.log(jsonResult.fund);
-        console.log("Type of jsonResult.fund:", typeof jsonResult.fund);
+        // console.log(jsonResult);
+        // console.log(jsonResult.fund);
+        // console.log("Type of jsonResult.fund:", typeof jsonResult.fund);
 
         if (jsonResult && jsonResult.fund !== undefined) { // Check if balance is not undefined
           // const humanReadableBalance = (typeof result.balance.toHuman === 'function')
