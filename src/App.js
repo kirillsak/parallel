@@ -22,18 +22,24 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { mainListItems } from './components/listItems';
 import Card from '@mui/material/Card';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import SupplyCard from './components/SupplyCard';
+import { useState } from 'react';
+// import Dialog from '@mui/material/Dialog';
+// import DialogContent from '@mui/material/DialogContent';
+// import DialogContentText from '@mui/material/DialogContentText';
+// import DialogTitle from '@mui/material/DialogTitle';
 
 import { SubstrateContextProvider, useSubstrateState } from './substrate-lib'
 import { DeveloperConsole } from './substrate-lib/components'
-import AuthComponent from './components/Authorisation.jsx'
+// import AuthComponent from './components/Authorisation.jsx'
 import { UserProvider } from './components/UserContext'
-import Interactor from './Interactor'
+// import Interactor from './Interactor'
 import BalancesSection from './components/BalancesSection'
-import { Stack } from '@mui/material';
+// import { Stack } from '@mui/material';
 import TreasuryBalancesSection from './components/TreasuryBalancesSection';
 import AdminsCard from './components/AdminsCard';
+import AuthComponent2 from './components/NewAuthorisation';
 /*
 import AccountSelector from './AccountSelector'
 import Balances from './Balances'
@@ -124,10 +130,20 @@ const defaultTheme = createTheme({
 
 function Main() {
   const { apiState, apiError, keyringState } = useSubstrateState()
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  // const [signUpOpen, setSignUpOpen] = useState(false);
+  // // const [logInOpen, setLogInOpen] = useState(false);
+  // const handleClickSignUpOpen = () => {
+  //   setSignUpOpen(true);
+  // };
+
+  // const handleSignUpClose = () => {
+  //   setSignUpOpen(false);
+  // };
 
   const loader = text => (
     <Dimmer active>
@@ -197,10 +213,25 @@ function Main() {
                   </Typography>
                 </Card>
               </Container>
-              <Stack direction="row" spacing={2}>
-                <Button variant="outlined" sx={{ borderRadius: '50px' }}>Sign Up</Button>
+              <AuthComponent2 />
+              {/* <Stack direction="row" spacing={2}>
+                <Button variant="outlined" sx={{ borderRadius: '50px' }} onClick={handleClickSignUpOpen}>
+                  Sign Up
+                </Button>
+                <Dialog
+                  open={signUpOpen}
+                  onClose={handleSignUpClose}
+                >
+                  <DialogTitle sx={{ color: "Black" }}>Sign Up</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      To subscribe to this website, please enter your email address here. We
+                      will send updates occasionally.
+                    </DialogContentText>
+                  </DialogContent>
+                </Dialog>
                 <Button variant="contained" sx={{ borderRadius: '50px' }}>Log In</Button>
-              </Stack>
+              </Stack> */}
             </Toolbar>
           </AppBar>
           <Drawer variant="permanent" open={open}>
@@ -230,12 +261,12 @@ function Main() {
             }}
           >
             <Toolbar />
-            <AuthComponent />
+            {/* <AuthComponent /> */}
             <BalancesSection />
             <SupplyCard />
             <TreasuryBalancesSection />
             <AdminsCard />
-            <Interactor />
+            {/* <Interactor /> */}
           </Box>
         </Box>
 
@@ -244,6 +275,8 @@ function Main() {
     </ThemeProvider>
   )
 }
+
+
 
 export default function App() {
   return (
