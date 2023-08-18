@@ -122,14 +122,13 @@ function FormDialog() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Subscribe</Button>
           <TxButton label="Submit" setStatus={setStatus} type="SIGNED-TX" attrs={{
             palletRpc: 'communities',
             callable: 'addAdmin',
             inputParams: [communityId, newAdmin],
             paramFields: [true, true],
           }} />
-          <div style={{ overflowWrap: 'break-word' }}>{status}</div>
+          <div style={{ overflowWrap: 'break-word', color: 'black' }}>{status}</div>
         </DialogActions>
       </Dialog>
     </div>

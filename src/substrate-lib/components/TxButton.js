@@ -311,8 +311,8 @@ function TxButton({
   return (
     <Button
       basic
-      color={color}
-      style={style}
+      color={'black'}
+      style={{ color: 'black' }}
       type="submit"
       onClick={transaction}
       disabled={
