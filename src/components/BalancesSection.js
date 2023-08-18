@@ -64,7 +64,7 @@ function BalancesSection() {
             <NativeBalanceCard address={userAddress} />
           </Grid>
           <Grid item>
-            <BalanceCard address={userAddress} />
+            <BalanceCard address={userAddress} assetId={0} />
           </Grid>
         </Grid>
       </Box>

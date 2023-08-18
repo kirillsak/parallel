@@ -59,68 +59,28 @@ function Body({ balance, tokensymbol }) {
   );
 }
 
-function BalanceCard(props) {
+function BalanceCard({ address, assetId }) { // Default value of 0 in case assetId isn't provided
   const [balance, setBalance] = useState(0);
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const { api } = useSubstrateState()
 
-  // const [api, setApi] = useState(null);
-
-  // useEffect(() => {
-  //   const setupApi = async () => {
-  //     const wsProvider = new WsProvider("ws://127.0.0.1:9944");
-  //     const api = await ApiPromise.create({ provider: wsProvider });
-  //     setApi(api);
-  //   };
-
-  //   setupApi();
-
-  //   return () => {
-  //     api && api.disconnect(); // Close the WebSocket connection when component is unmounted
-  //   };
-  // }, []);
-
   useEffect(() => {
     const fetchBalance = async () => {
       if (!api) return; // Ensure the API is set before fetching
 
-      const accountAddress = props.address; // Using address to fetch balance
-      // const assetId = 0;
+      const accountAddress = address; // Using address to fetch balance
 
       try {
-        const result = await api.query.assets.account(0, accountAddress);
-        // console.log(result);
-        // console.log("Full result:", JSON.stringify(result, null, 2));
-        // console.log("Type of result:", typeof result);
-        // console.log("Type of result.balance:", typeof result.balance);
-        // console.log(Object.prototype.hasOwnProperty.call(result, 'balance'));
-        // for (const key in result) {
-        //   console.log(key, result[key]);
-        // }
-        // let proto = Object.getPrototypeOf(result);
-        // while (proto) {
-        //   console.log(proto);
-        //   proto = Object.getPrototypeOf(proto);
-        // }
+        const result = await api.query.assets.account(assetId, accountAddress);
         const jsonResult = result.toJSON();
-        // console.log(jsonResult);
-        // console.log(jsonResult.balance);
-        // console.log("Type of jsonResult.balance:", typeof jsonResult.balance);
 
-
-
-        if (jsonResult && jsonResult.balance !== undefined) { // Check if balance is not undefined
-          // const humanReadableBalance = (typeof result.balance.toHuman === 'function')
-          //   ? result.balance.toHuman()
-          //   : result.balance.toString(); // If toHuman isn't available, just convert the balance to string
-
+        if (jsonResult && jsonResult.balance !== undefined) {
           setBalance(jsonResult.balance);
         } else {
           console.warn(
             "Unable to retrieve the 'free' balance or the result is unexpected."
           );
-
         }
       } catch (error) {
         console.error("Error fetching account balance:", error);
@@ -128,18 +88,14 @@ function BalanceCard(props) {
     };
 
     fetchBalance();
-  }, [props.address, api]);
+  }, [address, api, assetId]);
 
   useEffect(() => {
     const fetchTokenNameAndSymbol = async () => {
       if (!api) return; // Ensure the API is set before fetching
 
-      const assetId = 0;
-
       try {
         const result = await api.query.assets.metadata(assetId);
-        console.log("Full result:", JSON.stringify(result, null, 2));
-
         const jsonResult = result.toJSON();
 
         if (jsonResult && jsonResult.name !== undefined) {
@@ -161,12 +117,12 @@ function BalanceCard(props) {
         }
 
       } catch (error) {
-        console.error("Error fetching toke symbol:", error);
+        console.error("Error fetching token symbol:", error);
       }
     };
 
     fetchTokenNameAndSymbol();
-  }, [api]);
+  }, [api, assetId]);
 
   return (
     <Card sx={{ backgroundColor: "#171717", borderRadius: "30px" }}>
