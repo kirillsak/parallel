@@ -28,11 +28,18 @@ function AuthComponent2() {
   const [address, setAddress] = useState('')
   const [mnemonic, setMnemonic] = useState('')
   const [message, setMessage] = useState('')
-  const { loggedInUser, setLoggedInUser } = useUser()
+  //const { loggedInUser, setLoggedInUser } = useUser()
+  const { loggedInUser, setLoggedInUser, profileImage, setProfileImage } =
+    useUser()
+
   const [openDialog, setOpenDialog] = useState(false)
   const [dialogType, setDialogType] = useState('login') // 'login' or 'signup'
   const [isLoggedIn, setIsLoggedIn] = useState(!!storedUser)
   const [anchorEl, setAnchorEl] = useState(null)
+  const storedProfilePicture = sessionStorage.getItem('profilePicture')
+  const [profilePicture, setProfilePicture] = useState(
+    storedProfilePicture || null
+  )
 
   useEffect(() => {
     if (storedUser && !isLoggedIn) {
@@ -62,6 +69,11 @@ function AuthComponent2() {
       setLoggedInUser(username)
       setMessage(response.data.message)
       setIsLoggedIn(true) // Update the logged-in state
+      const profilePicResponse = await axios.get(
+        `http://localhost:3001/getProfilePic/${username}`
+      )
+      setProfilePicture(profilePicResponse.data.profilePic)
+
       sessionStorage.setItem('loggedInUser', username)
 
       console.log(
@@ -87,6 +99,44 @@ function AuthComponent2() {
       setMessage(response.data.message)
     } catch (error) {
       setMessage(error.response.data.message)
+    }
+  }
+
+  const handleUploadClick = e => {
+    const input = document.getElementById('profile-picture-upload')
+    input.click()
+  }
+
+  const handleProfilePictureChange = async e => {
+    const file = e.target.files[0]
+    setProfilePicture(URL.createObjectURL(file))
+
+    const formData = new FormData()
+    formData.append('profilePic', file)
+
+    formData.append('username', username)
+
+    try {
+      const response = await axios.post(
+        'http://localhost:3001/uploadProfilePic',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+
+      // The backend responds with the saved image's URL or relative path.
+
+      // Save this imageUrl to the user's state:
+      const backendURL = 'http://localhost:3001' // or wherever your backend is hosted
+      const completeImageUrl = backendURL + response.data.imageUrl
+      setProfileImage(completeImageUrl) // Update the context
+      sessionStorage.setItem('profilePicture', completeImageUrl) // Update the sessionStorage
+      setProfilePicture(completeImageUrl)
+    } catch (error) {
+      console.log('Failed to upload image:', error)
     }
   }
 
@@ -170,13 +220,28 @@ function AuthComponent2() {
       {isLoggedIn ? (
         <div>
           <IconButton onClick={handleClick}>
-            <Avatar>{loggedInUser.charAt(0).toUpperCase()}</Avatar>
+            <Avatar src={profilePicture || profileImage}>
+              {!profileImage && !profilePicture
+                ? loggedInUser.charAt(0).toUpperCase()
+                : null}
+            </Avatar>
           </IconButton>
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
+            <MenuItem onClick={handleUploadClick} sx={{ color: 'black' }}>
+              <input
+                type="file"
+                style={{ display: 'none' }}
+                id="profile-picture-upload"
+                onChange={handleProfilePictureChange}
+              />
+              <label htmlFor="profile-picture-upload">
+                Upload Profile Picture
+              </label>
+            </MenuItem>
             <MenuItem onClick={handleSignOut} sx={{ color: 'black' }}>
               <Button variant="outlined" color="primary">
                 Sign Out
