@@ -13,7 +13,7 @@ function BalancesSection() {
   const { loggedInUser } = useUser()
   const { api } = useSubstrateState()
   const [assetIds, setAssetIds] = useState([]);
-  // const [balances, setBalances] = useState({});
+  const [balances, setBalances] = useState({});
 
 
   useEffect(() => {
@@ -46,7 +46,24 @@ function BalancesSection() {
         const fetchedAssetIds = allKeys.map((key) => key.args[0].toNumber());
         console.log("assetIds", fetchedAssetIds);
 
+        let fetchedBalances = {};
+        for (let assetId of fetchedAssetIds) {
+          const result = await api.query.assets.account(assetId, userAddress);
+          const jsonResult = result.toJSON();
+          console.log("jsonResult Balance for", assetId, " is ", jsonResult);
+
+          if (jsonResult && jsonResult.balance !== undefined) {
+            fetchedBalances[assetId] = jsonResult.balance;
+          } else {
+            console.warn(
+              "Unable to retrieve the 'free' balance or the result is unexpected."
+            );
+          }
+
+        }
+
         setAssetIds(fetchedAssetIds);
+        setBalances(fetchedBalances);
 
       } catch (error) {
         console.error("Error fetching Assets:", error);
@@ -55,7 +72,7 @@ function BalancesSection() {
     };
 
     fetchAssets();
-  }, [api]);
+  }, [api, userAddress]);
 
   // useEffect(() => {
   //   const fetchAssets = async () => {
@@ -122,9 +139,11 @@ function BalancesSection() {
             <NativeBalanceCard address={userAddress} />
           </Grid>
           {assetIds.map((assetId) => (
-            <Grid item key={assetId}>
-              <BalanceCard address={userAddress} assetId={assetId} />
-            </Grid>
+            balances[assetId] && balances[assetId] > 0 ? (
+              <Grid item key={assetId}>
+                <BalanceCard address={userAddress} assetId={assetId} />
+              </Grid>
+            ) : null
           ))}
         </Grid>
       </Box>
