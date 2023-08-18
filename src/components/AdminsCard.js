@@ -276,7 +276,7 @@ function AdminsCard(props) {
         setItems(adminAccountIds);
 
       } catch (error) {
-        console.error("Error fetching fund account:", error);
+        console.error("Error fetching community admins:", error);
       }
     };
 

@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography'
 import NativeBalanceCard from './NativeBalanceCard'
 import BalanceCard from './BalanceCard'
 import React, { useState, useEffect } from 'react'
+import { useSubstrateState } from '../substrate-lib'
 
 import axios from 'axios'
 import { useUser } from './UserContext'
@@ -10,6 +11,10 @@ import { useUser } from './UserContext'
 function BalancesSection() {
   const [userAddress, setUserAddress] = useState('')
   const { loggedInUser } = useUser()
+  const { api } = useSubstrateState()
+  const [assetIds, setAssetIds] = useState([]);
+  // const [balances, setBalances] = useState({});
+
 
   useEffect(() => {
     const fetchUserAddress = async () => {
@@ -30,6 +35,59 @@ function BalancesSection() {
 
     fetchUserAddress()
   }, [loggedInUser])
+
+  useEffect(() => {
+    const fetchAssets = async () => {
+      if (!api) return; // Ensure the API is set before fetching
+
+      try {
+        const allKeys = await api.query.assets.asset.keys();
+        console.log("all keys", JSON.stringify(allKeys, null, 2));
+        const fetchedAssetIds = allKeys.map((key) => key.args[0].toNumber());
+        console.log("assetIds", fetchedAssetIds);
+
+        setAssetIds(fetchedAssetIds);
+
+      } catch (error) {
+        console.error("Error fetching Assets:", error);
+      }
+
+    };
+
+    fetchAssets();
+  }, [api]);
+
+  // useEffect(() => {
+  //   const fetchAssets = async () => {
+  //     if (!api || !userAddress) return;
+
+  //     try {
+  //       const allKeys = await api.query.assets.asset.keys();
+  //       const fetchedAssetIds = allKeys.map((key) => key.args[0].toNumber());
+
+  //       const assetBalances = {};
+
+  //       for (let asset of fetchedAssetIds) {
+  //         const balanceInfo = await api.query.assets.account(asset, userAddress);
+  //         const balance = balanceInfo.free.toNumber(); // assuming this is how you get the balance. Adjust if different.
+
+  //         if (balance > 0) {
+  //           assetBalances[asset] = balance;
+  //         }
+  //       }
+
+  //       setBalances(assetBalances);
+  //       setAssetIds(Object.keys(assetBalances).map(Number));
+
+  //     } catch (error) {
+  //       console.error("Error fetching Assets:", error);
+  //     }
+  //   };
+
+  //   fetchAssets();
+  // }, [api, userAddress]);
+
+
 
   return (
     <Stack spacing={2} padding={1} direction="row">
@@ -63,9 +121,11 @@ function BalancesSection() {
           <Grid item>
             <NativeBalanceCard address={userAddress} />
           </Grid>
-          <Grid item>
-            <BalanceCard address={userAddress} assetId={0} />
-          </Grid>
+          {assetIds.map((assetId) => (
+            <Grid item key={assetId}>
+              <BalanceCard address={userAddress} assetId={assetId} />
+            </Grid>
+          ))}
         </Grid>
       </Box>
     </Stack>
