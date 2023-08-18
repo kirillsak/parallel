@@ -1,98 +1,101 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 // import { Keyring } from "@polkadot/keyring";
-import { mnemonicGenerate } from "@polkadot/util-crypto";
-import { useUser } from "./UserContext";
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import IconButton from "@mui/material/IconButton";
+import { mnemonicGenerate } from '@polkadot/util-crypto'
+import { useUser } from './UserContext'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import Avatar from '@mui/material/Avatar'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import IconButton from '@mui/material/IconButton'
 import { useSubstrate } from '../substrate-lib'
 
 function AuthComponent2() {
-  const storedUser = sessionStorage.getItem("loggedInUser");
+  const storedUser = sessionStorage.getItem('loggedInUser')
 
-  const [initiateSignup, setInitiateSignup] = useState(false);
-  const [accountInfo, setAccountInfo] = useState({});
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [address, setAddress] = useState("");
-  const [mnemonic, setMnemonic] = useState("");
-  const [message, setMessage] = useState("");
-  const { loggedInUser, setLoggedInUser } = useUser();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dialogType, setDialogType] = useState('login'); // 'login' or 'signup'
-  const [isLoggedIn, setIsLoggedIn] = useState(!!storedUser);
-  const [anchorEl, setAnchorEl] = useState(null);
-
+  const [initiateSignup, setInitiateSignup] = useState(false)
+  const [accountInfo, setAccountInfo] = useState({})
+  const [username, setUsername] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [address, setAddress] = useState('')
+  const [mnemonic, setMnemonic] = useState('')
+  const [message, setMessage] = useState('')
+  const { loggedInUser, setLoggedInUser } = useUser()
+  const [openDialog, setOpenDialog] = useState(false)
+  const [dialogType, setDialogType] = useState('login') // 'login' or 'signup'
+  const [isLoggedIn, setIsLoggedIn] = useState(!!storedUser)
+  const [anchorEl, setAnchorEl] = useState(null)
 
   useEffect(() => {
     if (storedUser && !isLoggedIn) {
-      setLoggedInUser(storedUser);
-      setIsLoggedIn(true);
+      setLoggedInUser(storedUser)
+      setIsLoggedIn(true)
     }
-  }, []);
+  }, [])
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget)
+  }
 
   const handleClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
   const {
     state: { keyring },
   } = useSubstrate()
 
-
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/login", {
+      const response = await axios.post('http://localhost:3001/login', {
         username,
         password,
-      });
-      setLoggedInUser(username);
-      setMessage(response.data.message);
-      setIsLoggedIn(true); // Update the logged-in state
-      sessionStorage.setItem("loggedInUser", username);
+      })
+      setLoggedInUser(username)
+      setMessage(response.data.message)
+      setIsLoggedIn(true) // Update the logged-in state
+      sessionStorage.setItem('loggedInUser', username)
 
-
-      console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
+      console.log(
+        'All key pairs after adding',
+        JSON.stringify(keyring.getPairs())
+      )
     } catch (error) {
-      setMessage(error.response.data.message);
+      setMessage(error.response.data.message)
     }
-  };
-
+  }
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/register", {
+      const response = await axios.post('http://localhost:3001/register', {
         username,
+        firstName,
+        lastName,
         email,
         password,
         address,
         mnemonic,
-      });
-      setMessage(response.data.message);
+      })
+      setMessage(response.data.message)
     } catch (error) {
-      setMessage(error.response.data.message);
+      setMessage(error.response.data.message)
     }
-  };
+  }
 
   const createAccount = () => {
     // console.log('All key pairs before keyring', JSON.stringify(keyring.getPairs()));
     // const keyring = new Keyring({ type: "sr25519" });
 
     // console.log('All key pairs before adding', JSON.stringify(keyring.getPairs()));
-    const newMnemonic = mnemonicGenerate();
+    const newMnemonic = mnemonicGenerate()
     // console.log(keyring);
     // const allPropertiesAndMethods = [
     //   ...Object.getOwnPropertyNames(keyring),
@@ -100,76 +103,81 @@ function AuthComponent2() {
     // ];
     // console.log(allPropertiesAndMethods);
     // const pair = keyring.createFromUri(newMnemonic, { name: username }, "sr25519"); // Add the name as meta
-    const { pair, json } = keyring.addUri(newMnemonic, 'myStr0ngP@ssworD', { name: username });
-    console.log(json);
+    const { pair, json } = keyring.addUri(newMnemonic, 'myStr0ngP@ssworD', {
+      name: username,
+    })
+    console.log(json)
 
     // Store this pair in your application's keyring
     // keyring.addPair(pair);
 
-    console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
+    console.log(
+      'All key pairs after adding',
+      JSON.stringify(keyring.getPairs())
+    )
 
-    const address = pair.address;
-    setAddress(address);
-    setMnemonic(newMnemonic);
-    setInitiateSignup(true);
-    return { address, mnemonic: newMnemonic, name: pair.meta.name };
-  };
+    const address = pair.address
+    setAddress(address)
+    setMnemonic(newMnemonic)
+    setInitiateSignup(true)
+    return { address, mnemonic: newMnemonic, name: pair.meta.name }
+  }
 
   const handleCreate = () => {
-    const account = createAccount();
-    setAccountInfo(account);
+    const account = createAccount()
+    setAccountInfo(account)
     // Now, initiate the signup process
-    setInitiateSignup(true);
-  };
+    setInitiateSignup(true)
+  }
 
   useEffect(() => {
     if (initiateSignup) {
-      handleSignup();
-      setInitiateSignup(false); // Reset for future signups
+      handleSignup()
+      setInitiateSignup(false) // Reset for future signups
     }
-  }, [initiateSignup]);
+  }, [initiateSignup])
 
   const handleOpenLogin = () => {
-    setDialogType('login');
-    setOpenDialog(true);
-  };
+    setDialogType('login')
+    setOpenDialog(true)
+  }
 
   const handleOpenSignup = () => {
-    setDialogType('signup');
-    setOpenDialog(true);
-  };
+    setDialogType('signup')
+    setOpenDialog(true)
+  }
 
   const handleSignOut = () => {
     // Reset the user's state
-    setUsername("");
-    setEmail("");
-    setPassword("");
-    setAddress("");
-    setMnemonic("");
-    setMessage("");
-    setLoggedInUser(null); // assuming the useUser context handles this appropriately
-    setIsLoggedIn(false);
-    sessionStorage.removeItem("loggedInUser");
-    handleClose(); // close the dropdown menu
+    setUsername('')
+    setFirstName('')
+    setLastName('')
+    setEmail('')
+    setPassword('')
+    setAddress('')
+    setMnemonic('')
+    setMessage('')
+    setLoggedInUser(null) // assuming the useUser context handles this appropriately
+    setIsLoggedIn(false)
+    sessionStorage.removeItem('loggedInUser')
+    handleClose() // close the dropdown menu
 
-    window.location.reload();
-  };
+    window.location.reload()
+  }
 
   return (
     <div>
       {isLoggedIn ? (
         <div>
           <IconButton onClick={handleClick}>
-            <Avatar>
-              {loggedInUser.charAt(0).toUpperCase()}
-            </Avatar>
+            <Avatar>{loggedInUser.charAt(0).toUpperCase()}</Avatar>
           </IconButton>
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleSignOut} sx={{ color: 'black' }} >
+            <MenuItem onClick={handleSignOut} sx={{ color: 'black' }}>
               <Button variant="outlined" color="primary">
                 Sign Out
               </Button>
@@ -178,10 +186,19 @@ function AuthComponent2() {
         </div> // Display an avatar with the first character of the username
       ) : (
         <>
-          <Button variant="contained" sx={{ borderRadius: '50px' }} color="primary" onClick={handleOpenLogin}>
+          <Button
+            variant="contained"
+            sx={{ borderRadius: '50px' }}
+            color="primary"
+            onClick={handleOpenLogin}
+          >
             Login
           </Button>
-          <Button variant="outlined" sx={{ borderRadius: '50px' }} onClick={handleOpenSignup}>
+          <Button
+            variant="outlined"
+            sx={{ borderRadius: '50px' }}
+            onClick={handleOpenSignup}
+          >
             Signup
           </Button>
         </>
@@ -194,16 +211,34 @@ function AuthComponent2() {
             fullWidth
             label="Username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             inputProps={{ style: { color: 'black' } }}
           />
+          {dialogType === 'signup' && (
+            <TextField
+              fullWidth
+              label="First Name"
+              value={firstName}
+              onChange={e => setFirstName(e.target.value)}
+              inputProps={{ style: { color: 'black' } }}
+            />
+          )}
+          {dialogType === 'signup' && (
+            <TextField
+              fullWidth
+              label="Last Name"
+              value={lastName}
+              onChange={e => setLastName(e.target.value)}
+              inputProps={{ style: { color: 'black' } }}
+            />
+          )}
           {dialogType === 'signup' && (
             <TextField
               fullWidth
               type="email"
               label="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               inputProps={{ style: { color: 'black' } }}
             />
           )}
@@ -212,12 +247,11 @@ function AuthComponent2() {
             type="password"
             label="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             inputProps={{ style: { color: 'black' } }}
           />
-          <Typography color="error">
-            {message}
-          </Typography>
+
+          <Typography color="error">{message}</Typography>
           {dialogType === 'login' ? (
             <Button color="primary" onClick={handleLogin}>
               Login
@@ -242,7 +276,7 @@ function AuthComponent2() {
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default AuthComponent2;
+export default AuthComponent2
