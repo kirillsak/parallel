@@ -59,36 +59,10 @@ function Body({ balance, tokensymbol }) {
   );
 }
 
-function BalanceCard({ address, assetId }) { // Default value of 0 in case assetId isn't provided
-  const [balance, setBalance] = useState(0);
+function BalanceCard({ address, assetId, balance }) {
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const { api } = useSubstrateState()
-
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (!api) return; // Ensure the API is set before fetching
-
-      const accountAddress = address; // Using address to fetch balance
-
-      try {
-        const result = await api.query.assets.account(assetId, accountAddress);
-        const jsonResult = result.toJSON();
-
-        if (jsonResult && jsonResult.balance !== undefined) {
-          setBalance(jsonResult.balance);
-        } else {
-          console.warn(
-            "Unable to retrieve the 'free' balance or the result is unexpected."
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching account balance:", error);
-      }
-    };
-
-    fetchBalance();
-  }, [address, api, assetId]);
 
   useEffect(() => {
     const fetchTokenNameAndSymbol = async () => {

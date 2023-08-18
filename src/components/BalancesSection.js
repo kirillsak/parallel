@@ -74,36 +74,6 @@ function BalancesSection() {
     fetchAssets();
   }, [api, userAddress]);
 
-  // useEffect(() => {
-  //   const fetchAssets = async () => {
-  //     if (!api || !userAddress) return;
-
-  //     try {
-  //       const allKeys = await api.query.assets.asset.keys();
-  //       const fetchedAssetIds = allKeys.map((key) => key.args[0].toNumber());
-
-  //       const assetBalances = {};
-
-  //       for (let asset of fetchedAssetIds) {
-  //         const balanceInfo = await api.query.assets.account(asset, userAddress);
-  //         const balance = balanceInfo.free.toNumber(); // assuming this is how you get the balance. Adjust if different.
-
-  //         if (balance > 0) {
-  //           assetBalances[asset] = balance;
-  //         }
-  //       }
-
-  //       setBalances(assetBalances);
-  //       setAssetIds(Object.keys(assetBalances).map(Number));
-
-  //     } catch (error) {
-  //       console.error("Error fetching Assets:", error);
-  //     }
-  //   };
-
-  //   fetchAssets();
-  // }, [api, userAddress]);
-
 
 
   return (
@@ -141,7 +111,7 @@ function BalancesSection() {
           {assetIds.map((assetId) => (
             balances[assetId] && balances[assetId] > 0 ? (
               <Grid item key={assetId}>
-                <BalanceCard address={userAddress} assetId={assetId} />
+                <BalanceCard address={userAddress} assetId={assetId} balance={balances[assetId]} />
               </Grid>
             ) : null
           ))}
