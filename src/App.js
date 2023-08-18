@@ -22,7 +22,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { mainListItems } from './components/listItems';
 import Card from '@mui/material/Card';
-// import Button from '@mui/material/Button';
+import Button from '@mui/material/Button';
 import SupplyCard from './components/SupplyCard';
 import { useState } from 'react';
 // import Dialog from '@mui/material/Dialog';
@@ -34,7 +34,7 @@ import { SubstrateContextProvider, useSubstrateState } from './substrate-lib'
 import { DeveloperConsole } from './substrate-lib/components'
 // import AuthComponent from './components/Authorisation.jsx'
 import { UserProvider } from './components/UserContext'
-import Interactor from './Interactor'
+// import Interactor from './Interactor'
 import BalancesSection from './components/BalancesSection'
 // import { Stack } from '@mui/material';
 import TreasuryBalancesSection from './components/TreasuryBalancesSection';
@@ -138,6 +138,7 @@ const defaultTheme = createTheme({
 function Main() {
   const { apiState, apiError, keyringState } = useSubstrateState()
   const [open, setOpen] = useState(true);
+  const [dashboardView, setDashboardView] = useState('user');
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -220,25 +221,10 @@ function Main() {
                   </Typography>
                 </Card>
               </Container>
+              <Button onClick={() => setDashboardView(dashboardView === 'user' ? 'admin' : 'user')}>
+                Switch to {dashboardView === 'user' ? 'Community Admin' : 'User'} Dashboard
+              </Button>
               <AuthComponent2 />
-              {/* <Stack direction="row" spacing={2}>
-                <Button variant="outlined" sx={{ borderRadius: '50px' }} onClick={handleClickSignUpOpen}>
-                  Sign Up
-                </Button>
-                <Dialog
-                  open={signUpOpen}
-                  onClose={handleSignUpClose}
-                >
-                  <DialogTitle sx={{ color: "Black" }}>Sign Up</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
-                      To subscribe to this website, please enter your email address here. We
-                      will send updates occasionally.
-                    </DialogContentText>
-                  </DialogContent>
-                </Dialog>
-                <Button variant="contained" sx={{ borderRadius: '50px' }}>Log In</Button>
-              </Stack> */}
             </Toolbar>
           </AppBar>
           <Drawer variant="permanent" open={open}>
@@ -268,12 +254,19 @@ function Main() {
             }}
           >
             <Toolbar />
-            {/* <AuthComponent /> */}
-            <BalancesSection />
-            <SupplyCard />
-            <TreasuryBalancesSection />
-            <AdminsCard />
-            <Interactor />
+            {dashboardView === 'user' && (
+              <>
+                <BalancesSection />
+              </>
+            )}
+
+            {dashboardView === 'admin' && (
+              <>
+                <SupplyCard />
+                <TreasuryBalancesSection />
+                <AdminsCard />
+              </>
+            )}
           </Box>
         </Box>
 
