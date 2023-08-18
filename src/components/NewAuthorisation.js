@@ -16,8 +16,9 @@ import IconButton from "@mui/material/IconButton";
 import { useSubstrate } from '../substrate-lib'
 
 function AuthComponent2() {
-  const [initiateSignup, setInitiateSignup] = useState(false);
+  const storedUser = sessionStorage.getItem("loggedInUser");
 
+  const [initiateSignup, setInitiateSignup] = useState(false);
   const [accountInfo, setAccountInfo] = useState({});
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -25,11 +26,19 @@ function AuthComponent2() {
   const [address, setAddress] = useState("");
   const [mnemonic, setMnemonic] = useState("");
   const [message, setMessage] = useState("");
-  const { setLoggedInUser } = useUser();
+  const { loggedInUser, setLoggedInUser } = useUser();
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogType, setDialogType] = useState('login'); // 'login' or 'signup'
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!storedUser);
   const [anchorEl, setAnchorEl] = useState(null);
+
+
+  useEffect(() => {
+    if (storedUser && !isLoggedIn) {
+      setLoggedInUser(storedUser);
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -43,6 +52,7 @@ function AuthComponent2() {
     state: { keyring },
   } = useSubstrate()
 
+
   const handleLogin = async () => {
     try {
       const response = await axios.post("http://localhost:3001/login", {
@@ -52,13 +62,9 @@ function AuthComponent2() {
       setLoggedInUser(username);
       setMessage(response.data.message);
       setIsLoggedIn(true); // Update the logged-in state
-      // Handle successful login here. Store tokens, navigate, etc.
-      // const response2 = await axios.get(
-      //   `http://localhost:3001/getAddress/${username}`
-      // )
-      // const address = response2.data.address
-      // setCurrentAccount(keyring.getPair(address))
-      // console.log("Current Account is: ", currentAccount)
+      sessionStorage.setItem("loggedInUser", username);
+
+
       console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
     } catch (error) {
       setMessage(error.response.data.message);
@@ -143,6 +149,7 @@ function AuthComponent2() {
     setMessage("");
     setLoggedInUser(null); // assuming the useUser context handles this appropriately
     setIsLoggedIn(false);
+    sessionStorage.removeItem("loggedInUser");
     handleClose(); // close the dropdown menu
 
     window.location.reload();
@@ -154,7 +161,7 @@ function AuthComponent2() {
         <div>
           <IconButton onClick={handleClick}>
             <Avatar>
-              {username.charAt(0).toUpperCase()}
+              {loggedInUser.charAt(0).toUpperCase()}
             </Avatar>
           </IconButton>
           <Menu
