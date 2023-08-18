@@ -140,11 +140,11 @@ function TxButton({
     // transformed can be empty parameters
     // console.log('All key pairs', JSON.stringify(keyring.getPairs()))
     const pair = keyring.getPair(currentAccount);
-    const allPropertiesAndMethods = [
-      ...Object.getOwnPropertyNames(pair),
-      ...Object.getOwnPropertyNames(Object.getPrototypeOf(pair))
-    ];
-    console.log("Pair properties", allPropertiesAndMethods);
+    // const allPropertiesAndMethods = [
+    //   ...Object.getOwnPropertyNames(pair),
+    //   ...Object.getOwnPropertyNames(Object.getPrototypeOf(pair))
+    // ];
+    // console.log("Pair properties", allPropertiesAndMethods);
     if (pair.isLocked) {
       pair.unlock('myStr0ngP@ssworD');
     }

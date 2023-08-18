@@ -10,6 +10,9 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import IconButton from "@mui/material/IconButton";
 import { useSubstrate } from '../substrate-lib'
 
 function AuthComponent2() {
@@ -26,6 +29,16 @@ function AuthComponent2() {
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogType, setDialogType] = useState('login'); // 'login' or 'signup'
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const {
     state: { keyring },
   } = useSubstrate()
@@ -69,10 +82,10 @@ function AuthComponent2() {
   };
 
   const createAccount = () => {
-    console.log('All key pairs before keyring', JSON.stringify(keyring.getPairs()));
+    // console.log('All key pairs before keyring', JSON.stringify(keyring.getPairs()));
     // const keyring = new Keyring({ type: "sr25519" });
 
-    console.log('All key pairs before adding', JSON.stringify(keyring.getPairs()));
+    // console.log('All key pairs before adding', JSON.stringify(keyring.getPairs()));
     const newMnemonic = mnemonicGenerate();
     // console.log(keyring);
     // const allPropertiesAndMethods = [
@@ -120,10 +133,42 @@ function AuthComponent2() {
     setOpenDialog(true);
   };
 
+  const handleSignOut = () => {
+    // Reset the user's state
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    setAddress("");
+    setMnemonic("");
+    setMessage("");
+    setLoggedInUser(null); // assuming the useUser context handles this appropriately
+    setIsLoggedIn(false);
+    handleClose(); // close the dropdown menu
+
+    window.location.reload();
+  };
+
   return (
     <div>
       {isLoggedIn ? (
-        <Avatar>{username.charAt(0).toUpperCase()}</Avatar> // Display an avatar with the first character of the username
+        <div>
+          <IconButton onClick={handleClick}>
+            <Avatar>
+              {username.charAt(0).toUpperCase()}
+            </Avatar>
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleSignOut} sx={{ color: 'black' }} >
+              <Button variant="outlined" color="primary">
+                Sign Out
+              </Button>
+            </MenuItem>
+          </Menu>
+        </div> // Display an avatar with the first character of the username
       ) : (
         <>
           <Button variant="contained" sx={{ borderRadius: '50px' }} color="primary" onClick={handleOpenLogin}>

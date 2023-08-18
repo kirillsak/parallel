@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 // import { ApiPromise, WsProvider } from "@polkadot/api";
 import React, { useState, useEffect } from "react";
-import { List, ListItemButton, ListItemText } from "@mui/material";
+import { List, ListItemButton, ListItemText, Stack } from "@mui/material";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -48,7 +48,7 @@ function Header({ tokenLogo, tokenName }) {
   );
 }
 
-function FormDialog() {
+function AddAdminDialog() {
   const [open, setOpen] = React.useState(false);
   const [status, setStatus] = useState(null)
   const [userAddress, setUserAddress] = useState('')
@@ -126,6 +126,93 @@ function FormDialog() {
             palletRpc: 'communities',
             callable: 'addAdmin',
             inputParams: [communityId, newAdmin],
+            paramFields: [true, true],
+          }} />
+          <div style={{ overflowWrap: 'break-word', color: 'black' }}>{status}</div>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+}
+
+function RemoveAdminDialog() {
+  const [open, setOpen] = React.useState(false);
+  const [status, setStatus] = useState(null)
+  const [userAddress, setUserAddress] = useState('')
+  const { loggedInUser } = useUser()
+  const {
+    setCurrentAccount,
+    state: { keyring, currentAccount },
+  } = useSubstrate()
+  const [removeAdmin, setRemoveAdmin] = useState('');
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleInputChange = (event) => {
+    setRemoveAdmin(event.target.value);
+  };
+
+  useEffect(() => {
+    const fetchUserAddress = async () => {
+      try {
+        console.log(`Fetching address for user: ${loggedInUser}`)
+
+        if (loggedInUser) {
+          console.log(loggedInUser)
+          const response = await axios.get(
+            `http://localhost:3001/getAddress/${loggedInUser}`
+          )
+          setUserAddress(response.data.address)
+        }
+      } catch (error) {
+        console.error('Failed to fetch address:', error)
+      }
+    }
+
+    fetchUserAddress()
+  }, [loggedInUser])
+
+  useEffect(() => {
+    if (userAddress && !currentAccount) {
+      setCurrentAccount(userAddress);
+      console.log(`Set current account to ${userAddress}`)
+    }
+  }, [currentAccount, setCurrentAccount, keyring, userAddress])
+
+  const communityId = 0;
+
+  return (
+    <div>
+      <Button variant="outlined" onClick={handleClickOpen}>
+        Remove admin
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle sx={{ color: 'black' }}>Remove admin</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            id="account"
+            label="Username"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={removeAdmin} // controlled input
+            onChange={handleInputChange} // handle the input change
+            inputProps={{ style: { color: 'black' } }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <TxButton label="Submit" setStatus={setStatus} type="SIGNED-TX" attrs={{
+            palletRpc: 'communities',
+            callable: 'removeAdmin',
+            inputParams: [communityId, removeAdmin],
             paramFields: [true, true],
           }} />
           <div style={{ overflowWrap: 'break-word', color: 'black' }}>{status}</div>
@@ -321,9 +408,10 @@ function AdminsCard(props) {
           </List>
         </Box>
         <Divider />
-        <Box>
-          <FormDialog />
-        </Box>
+        <Stack direction="row" spacing={2}>
+          <AddAdminDialog />
+          <RemoveAdminDialog />
+        </Stack>
       </Box>
 
     </Card>
