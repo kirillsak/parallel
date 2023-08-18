@@ -4,6 +4,8 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import React, { useState, useEffect } from "react";
 import { useSubstrateState } from '../substrate-lib'
+import { hexToString } from '@polkadot/util';
+
 
 function Header({ tokenLogo, tokenName }) {
   return (
@@ -35,7 +37,7 @@ function Header({ tokenLogo, tokenName }) {
   );
 }
 
-function Body({ balance, tokenAbbreviation }) {
+function Body({ balance, tokensymbol }) {
   return (
     <Grid
       container
@@ -50,7 +52,7 @@ function Body({ balance, tokenAbbreviation }) {
       </Grid>
       <Grid item>
         <Typography variant="subtitle2" component="h3">
-          {tokenAbbreviation}
+          {tokensymbol}
         </Typography>
       </Grid>
     </Grid>
@@ -59,7 +61,10 @@ function Body({ balance, tokenAbbreviation }) {
 
 function BalanceCard(props) {
   const [balance, setBalance] = useState(0);
+  const [tokenName, setTokenName] = useState("");
+  const [tokenSymbol, setTokenSymbol] = useState("");
   const { api } = useSubstrateState()
+
   // const [api, setApi] = useState(null);
 
   // useEffect(() => {
@@ -125,7 +130,44 @@ function BalanceCard(props) {
     fetchBalance();
   }, [props.address, api]);
 
-  // const tokenSymbol = 
+  useEffect(() => {
+    const fetchTokenNameAndSymbol = async () => {
+      if (!api) return; // Ensure the API is set before fetching
+
+      const assetId = 0;
+
+      try {
+        const result = await api.query.assets.metadata(assetId);
+        console.log("Full result:", JSON.stringify(result, null, 2));
+
+        const jsonResult = result.toJSON();
+
+        if (jsonResult && jsonResult.name !== undefined) {
+          const tokenName = hexToString(jsonResult.name);
+          setTokenName(tokenName);
+        } else {
+          console.warn(
+            "Unable to retrieve the 'token name' or the result is unexpected."
+          );
+        }
+
+        if (jsonResult && jsonResult.symbol !== undefined) {
+          const tokenSymbol = hexToString(jsonResult.symbol);
+          setTokenSymbol(tokenSymbol);
+        } else {
+          console.warn(
+            "Unable to retrieve the 'token symbol' or the result is unexpected."
+          );
+        }
+
+      } catch (error) {
+        console.error("Error fetching toke symbol:", error);
+      }
+    };
+
+    fetchTokenNameAndSymbol();
+  }, [api]);
+
   return (
     <Card sx={{ backgroundColor: "#171717", borderRadius: "30px" }}>
       <Box
@@ -138,12 +180,12 @@ function BalanceCard(props) {
         <Box>
           <Header
             tokenLogo="https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png"
-            tokenName="Ethereum"
-            tokenAbbreviation="ETH"
+            tokenName={tokenName}
+            tokensymbol={tokenSymbol}
           />
         </Box>
         <Box>
-          <Body balance={balance} tokenAbbreviation="ETH" />
+          <Body balance={balance} tokensymbol={tokenSymbol} />
         </Box>
       </Box>
     </Card>
