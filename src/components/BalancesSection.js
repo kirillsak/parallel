@@ -98,7 +98,7 @@ function BalancesSection() {
             sx={{ fontSize: '2rem', color: 'black' }}
           >
             {loggedInUser
-              ? loggedInUser + "'s balances"
+              ? "Balances"
               : 'Login to see Balance'}
           </Typography>
         </Box>

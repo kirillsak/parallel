@@ -11,6 +11,8 @@ import { ApiPromise, WsProvider } from '@polkadot/api'
 function TreasuryBalancesSection() {
   const [communityFund, setCommunityFund] = useState('')
   const [api, setApi] = useState(null);
+  const [assetIds, setAssetIds] = useState([]);
+  const [balances, setBalances] = useState({});
 
   useEffect(() => {
     const setupApi = async () => {
@@ -61,6 +63,44 @@ function TreasuryBalancesSection() {
     fetchCommunityFund();
   }, [api]);
 
+  useEffect(() => {
+    const fetchAssets = async () => {
+      if (!api) return; // Ensure the API is set before fetching
+
+      try {
+        const allKeys = await api.query.assets.asset.keys();
+        console.log("all keys", JSON.stringify(allKeys, null, 2));
+        const fetchedAssetIds = allKeys.map((key) => key.args[0].toNumber());
+        console.log("assetIds", fetchedAssetIds);
+
+        let fetchedBalances = {};
+        for (let assetId of fetchedAssetIds) {
+          const result = await api.query.assets.account(assetId, communityFund);
+          const jsonResult = result.toJSON();
+          console.log("jsonResult Balance for", assetId, " is ", jsonResult);
+
+          if (jsonResult && jsonResult.balance !== undefined) {
+            fetchedBalances[assetId] = jsonResult.balance;
+          } else {
+            console.warn(
+              "Unable to retrieve the 'free' balance or the result is unexpected."
+            );
+          }
+
+        }
+
+        setAssetIds(fetchedAssetIds);
+        setBalances(fetchedBalances);
+
+      } catch (error) {
+        console.error("Error fetching Assets:", error);
+      }
+
+    };
+
+    fetchAssets();
+  }, [api, communityFund]);
+
   return (
     <Stack spacing={2} padding={1} direction="row">
       <Card
@@ -91,9 +131,13 @@ function TreasuryBalancesSection() {
           <Grid item>
             <NativeBalanceCard address={communityFund} />
           </Grid>
-          <Grid item>
-            <BalanceCard address={communityFund} />
-          </Grid>
+          {assetIds.map((assetId) => (
+            balances[assetId] && balances[assetId] > 0 ? (
+              <Grid item key={assetId}>
+                <BalanceCard address={communityFund} assetId={assetId} balance={balances[assetId]} />
+              </Grid>
+            ) : null
+          ))}
         </Grid>
       </Box>
     </Stack>
