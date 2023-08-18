@@ -2,8 +2,8 @@ import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import { ApiPromise, WsProvider } from "@polkadot/api";
 import React, { useState, useEffect } from "react";
+import { useSubstrateState } from '../substrate-lib'
 
 function Header({ tokenLogo, tokenName }) {
   return (
@@ -59,21 +59,22 @@ function Body({ balance, tokenAbbreviation }) {
 
 function BalanceCard(props) {
   const [balance, setBalance] = useState(0);
-  const [api, setApi] = useState(null);
+  const { api } = useSubstrateState()
+  // const [api, setApi] = useState(null);
 
-  useEffect(() => {
-    const setupApi = async () => {
-      const wsProvider = new WsProvider("ws://127.0.0.1:9944");
-      const api = await ApiPromise.create({ provider: wsProvider });
-      setApi(api);
-    };
+  // useEffect(() => {
+  //   const setupApi = async () => {
+  //     const wsProvider = new WsProvider("ws://127.0.0.1:9944");
+  //     const api = await ApiPromise.create({ provider: wsProvider });
+  //     setApi(api);
+  //   };
 
-    setupApi();
+  //   setupApi();
 
-    return () => {
-      api && api.disconnect(); // Close the WebSocket connection when component is unmounted
-    };
-  }, []);
+  //   return () => {
+  //     api && api.disconnect(); // Close the WebSocket connection when component is unmounted
+  //   };
+  // }, []);
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -123,6 +124,8 @@ function BalanceCard(props) {
 
     fetchBalance();
   }, [props.address, api]);
+
+  // const tokenSymbol = 
   return (
     <Card sx={{ backgroundColor: "#171717", borderRadius: "30px" }}>
       <Box
