@@ -16,7 +16,7 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
+// import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useUser } from './UserContext'
 import axios from 'axios'
@@ -57,6 +57,7 @@ function FormDialog() {
     setCurrentAccount,
     state: { keyring, currentAccount },
   } = useSubstrate()
+  const [newAdmin, setNewAdmin] = useState('');
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -64,6 +65,10 @@ function FormDialog() {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleInputChange = (event) => {
+    setNewAdmin(event.target.value);
   };
 
   useEffect(() => {
@@ -93,27 +98,26 @@ function FormDialog() {
     }
   }, [currentAccount, setCurrentAccount, keyring, userAddress])
 
+  const communityId = 0;
 
   return (
     <div>
       <Button variant="outlined" onClick={handleClickOpen}>
-        Open form dialog
+        Add admin
       </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Subscribe</DialogTitle>
+        <DialogTitle sx={{ color: 'black' }}>Add admin</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            To subscribe to this website, please enter your email address here. We
-            will send updates occasionally.
-          </DialogContentText>
           <TextField
             autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
+            id="account"
+            label="Username"
+            type="text"
             fullWidth
             variant="standard"
+            value={newAdmin} // controlled input
+            onChange={handleInputChange} // handle the input change
+            inputProps={{ style: { color: 'black' } }}
           />
         </DialogContent>
         <DialogActions>
@@ -121,8 +125,8 @@ function FormDialog() {
           <Button onClick={handleClose}>Subscribe</Button>
           <TxButton label="Submit" setStatus={setStatus} type="SIGNED-TX" attrs={{
             palletRpc: 'communities',
-            callable: 'transfer',
-            inputParams: [0, 0],
+            callable: 'addAdmin',
+            inputParams: [communityId, newAdmin],
             paramFields: [true, true],
           }} />
           <div style={{ overflowWrap: 'break-word' }}>{status}</div>

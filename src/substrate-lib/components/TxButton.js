@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Button } from 'semantic-ui-react'
-import { web3FromSource } from '@polkadot/extension-dapp'
+// import { web3FromSource } from '@polkadot/extension-dapp'
 
 import { useSubstrateState } from '../'
 import utils from '../utils'
 import { bnFromHex } from '@polkadot/util';
+import keyring from '@polkadot/ui-keyring'
 
 function TxButton({
   attrs = null,
@@ -33,7 +34,7 @@ function TxButton({
   const isConstant = () => type === 'CONSTANT'
 
   const loadSudoKey = () => {
-    ;(async function () {
+    ; (async function () {
       if (!api || !api.query.sudo) {
         return
       }
@@ -45,58 +46,60 @@ function TxButton({
   useEffect(loadSudoKey, [api])
 
   const getFromAcct = async () => {
-    const {
-      address,
-      meta: { source, isInjected },
-    } = currentAccount
+    // const {
+    //   address,
+    //   meta: { source, isInjected },
+    // } = currentAccount
 
-    if (!isInjected) {
-      return [currentAccount]
-    }
+    // if (!isInjected) {
+    //   return [currentAccount]
+    // }
 
-    // currentAccount is injected from polkadot-JS extension, need to return the addr and signer object.
-    // ref: https://polkadot.js.org/docs/extension/cookbook#sign-and-send-a-transaction
-    const injector = await web3FromSource(source)
-    return [address, { signer: injector.signer }]
+    // // currentAccount is injected from polkadot-JS extension, need to return the addr and signer object.
+    // // ref: https://polkadot.js.org/docs/extension/cookbook#sign-and-send-a-transaction
+    // const injector = await web3FromSource(source)
+    // return [address, { signer: injector.signer }]
+    console.log(`currentAccount: ${currentAccount}`)
+
+    return [currentAccount]
   }
 
-  const txResHandler = ({ events = [], status, txHash }) =>{
+  const txResHandler = ({ events = [], status, txHash }) => {
     status.isFinalized
       ? setStatus(`😉 Finalized. Block hash: ${status.asFinalized.toString()}`)
       : setStatus(`Current transaction status: ${status.type}`)
 
-      // Loop through Vec<EventRecord> to display all events
-      events.forEach(({ _, event: { data, method, section } }) => {
-        if ((section + ":" + method) === 'system:ExtrinsicFailed' ) {
-          // extract the data for this event
-          const [dispatchError, dispatchInfo] = data;
-          console.log(`dispatchinfo: ${dispatchInfo}`)
-          let errorInfo;
-          
-          // decode the error
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            // (For specific known errors, we can also do a check against the
-            // api.errors.<module>.<ErrorName>.is(dispatchError.asModule) guard)
-            const mod = dispatchError.asModule
-            const error = api.registry.findMetaError(
-                new Uint8Array([mod.index.toNumber(), bnFromHex(mod.error.toHex().slice(0, 4)).toNumber()])
-            )
-            let message = `${error.section}.${error.name}${
-                Array.isArray(error.docs) ? `(${error.docs.join('')})` : error.docs || ''
+    // Loop through Vec<EventRecord> to display all events
+    events.forEach(({ _, event: { data, method, section } }) => {
+      if ((section + ":" + method) === 'system:ExtrinsicFailed') {
+        // extract the data for this event
+        const [dispatchError, dispatchInfo] = data;
+        console.log(`dispatchinfo: ${dispatchInfo}`)
+        let errorInfo;
+
+        // decode the error
+        if (dispatchError.isModule) {
+          // for module errors, we have the section indexed, lookup
+          // (For specific known errors, we can also do a check against the
+          // api.errors.<module>.<ErrorName>.is(dispatchError.asModule) guard)
+          const mod = dispatchError.asModule
+          const error = api.registry.findMetaError(
+            new Uint8Array([mod.index.toNumber(), bnFromHex(mod.error.toHex().slice(0, 4)).toNumber()])
+          )
+          let message = `${error.section}.${error.name}${Array.isArray(error.docs) ? `(${error.docs.join('')})` : error.docs || ''
             }`
-            
-            errorInfo = `${message}`;
-            console.log(`Error-info::${JSON.stringify(error)}`)
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            errorInfo = dispatchError.toString();
-          }
-          setStatus(`😞 Transaction Failed! ${section}.${method}::${errorInfo}`)
-        } else if (section + ":" + method === 'system:ExtrinsicSuccess' ) {
-          setStatus(`❤️️ Transaction successful! tx hash: ${txHash} , Block hash: ${status.asFinalized.toString()}`)
+
+          errorInfo = `${message}`;
+          console.log(`Error-info::${JSON.stringify(error)}`)
+        } else {
+          // Other, CannotLookup, BadOrigin, no extra info
+          errorInfo = dispatchError.toString();
         }
-      });
+        setStatus(`😞 Transaction Failed! ${section}.${method}::${errorInfo}`)
+      } else if (section + ":" + method === 'system:ExtrinsicSuccess') {
+        setStatus(`❤️️ Transaction successful! tx hash: ${txHash} , Block hash: ${status.asFinalized.toString()}`)
+      }
+    });
   }
 
   const txErrHandler = err =>
@@ -132,16 +135,26 @@ function TxButton({
   }
 
   const signedTx = async () => {
-    const fromAcct = await getFromAcct()
+    // const fromAcct = await getFromAcct()
     const transformed = transformParams(paramFields, inputParams)
     // transformed can be empty parameters
+    // console.log('All key pairs', JSON.stringify(keyring.getPairs()))
+    const pair = keyring.getPair(currentAccount);
+    const allPropertiesAndMethods = [
+      ...Object.getOwnPropertyNames(pair),
+      ...Object.getOwnPropertyNames(Object.getPrototypeOf(pair))
+    ];
+    console.log("Pair properties", allPropertiesAndMethods);
+    if (pair.isLocked) {
+      pair.unlock('myStr0ngP@ssworD');
+    }
 
     const txExecute = transformed
       ? api.tx[palletRpc][callable](...transformed)
       : api.tx[palletRpc][callable]()
 
     const unsub = await txExecute
-      .signAndSend(...fromAcct, txResHandler)
+      .signAndSend(pair, txResHandler)
       .catch(txErrHandler)
 
     setUnsub(() => unsub)

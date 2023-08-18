@@ -124,7 +124,14 @@ const defaultTheme = createTheme({
   },
   typography: {
     fontFamily: 'Helvetica Neue, Arial',
-  }
+  },
+  overrides: {
+    MuiInputBase: {
+      input: {
+        color: 'black',
+      },
+    },
+  },
 });
 
 

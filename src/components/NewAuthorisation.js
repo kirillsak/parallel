@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Keyring } from "@polkadot/keyring";
+// import { Keyring } from "@polkadot/keyring";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
 import { useUser } from "./UserContext";
 import Dialog from '@mui/material/Dialog';
@@ -10,7 +10,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
-// import { useSubstrate } from '../substrate-lib'
+import { useSubstrate } from '../substrate-lib'
 
 function AuthComponent2() {
   const [initiateSignup, setInitiateSignup] = useState(false);
@@ -26,11 +26,9 @@ function AuthComponent2() {
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogType, setDialogType] = useState('login'); // 'login' or 'signup'
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // const {
-  //   setCurrentAccount,
-  //   state: { keyring, currentAccount },
-  // } = useSubstrate()
+  const {
+    state: { keyring },
+  } = useSubstrate()
 
   const handleLogin = async () => {
     try {
@@ -48,6 +46,7 @@ function AuthComponent2() {
       // const address = response2.data.address
       // setCurrentAccount(keyring.getPair(address))
       // console.log("Current Account is: ", currentAccount)
+      console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
     } catch (error) {
       setMessage(error.response.data.message);
     }
@@ -70,13 +69,25 @@ function AuthComponent2() {
   };
 
   const createAccount = () => {
-    const keyring = new Keyring({ type: "sr25519" });
+    console.log('All key pairs before keyring', JSON.stringify(keyring.getPairs()));
+    // const keyring = new Keyring({ type: "sr25519" });
 
+    console.log('All key pairs before adding', JSON.stringify(keyring.getPairs()));
     const newMnemonic = mnemonicGenerate();
-    const pair = keyring.addFromUri(newMnemonic, { name: username }, "ed25519"); // Add the name as meta
+    // console.log(keyring);
+    // const allPropertiesAndMethods = [
+    //   ...Object.getOwnPropertyNames(keyring),
+    //   ...Object.getOwnPropertyNames(Object.getPrototypeOf(keyring))
+    // ];
+    // console.log(allPropertiesAndMethods);
+    // const pair = keyring.createFromUri(newMnemonic, { name: username }, "sr25519"); // Add the name as meta
+    const { pair, json } = keyring.addUri(newMnemonic, 'myStr0ngP@ssworD', { name: username });
+    console.log(json);
 
     // Store this pair in your application's keyring
-    keyring.addPair(pair);
+    // keyring.addPair(pair);
+
+    console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
 
     const address = pair.address;
     setAddress(address);
