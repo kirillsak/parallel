@@ -2,8 +2,8 @@ import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import { ApiPromise, WsProvider } from "@polkadot/api";
 import React, { useState, useEffect } from "react";
+import { useSubstrateState } from "../substrate-lib";
 
 function Header({ tokenLogo, tokenName }) {
   return (
@@ -59,30 +59,14 @@ function Body({ balance, tokenAbbreviation }) {
 
 function NativeBalanceCard(props) {
   const [balance, setBalance] = useState(null);
-  const [api, setApi] = useState(null);
-
-  useEffect(() => {
-    const setupApi = async () => {
-      const wsProvider = new WsProvider("ws://127.0.0.1:9944");
-      const api = await ApiPromise.create({ provider: wsProvider });
-      setApi(api);
-    };
-
-    setupApi();
-
-    return () => {
-      api && api.disconnect(); // Close the WebSocket connection when component is unmounted
-    };
-  }, []);
+  const { api, currentAccount } = useSubstrateState()
 
   useEffect(() => {
     const fetchBalance = async () => {
       if (!api) return; // Ensure the API is set before fetching
 
-      const accountAddress = props.address; // Using address to fetch balance
-
       try {
-        const result = await api.query.system.account(accountAddress);
+        const result = await api.query.system.account(currentAccount);
         // console.log("Account result:", result);
         // console.log("Account Full result:", JSON.stringify(result, null, 2));
 
@@ -100,7 +84,9 @@ function NativeBalanceCard(props) {
     };
 
     fetchBalance();
-  }, [props.address, api]);
+  }, [api, currentAccount]);
+
+
   return (
     <Card sx={{ backgroundColor: "#171717", borderRadius: "30px" }}>
       <Box
@@ -113,12 +99,12 @@ function NativeBalanceCard(props) {
         <Box>
           <Header
             tokenLogo="https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png"
-            tokenName="Ethereum"
-            tokenAbbreviation="ETH"
+            tokenName="Parallel Coin"
+            tokenAbbreviation="PARA"
           />
         </Box>
         <Box>
-          <Body balance={balance} tokenAbbreviation="ETH" />
+          <Body balance={balance} tokenAbbreviation="PARA" />
         </Box>
       </Box>
     </Card>

@@ -14,6 +14,16 @@ const connectedSocket = parsedQuery.get('rpc') || config.PROVIDER_SOCKET
 ///
 // Initial state for `useReducer`
 
+const getCurrentAccountFromSession = () => {
+  try {
+    const account = sessionStorage.getItem('currentAccount');
+    return account ? JSON.parse(account) : null;
+  } catch (e) {
+    console.error("Error parsing 'currentAccount' from sessionStorage:", e);
+    return null;
+  }
+}
+
 const initialState = {
   // These are the states
   socket: connectedSocket,
@@ -23,7 +33,7 @@ const initialState = {
   api: null,
   apiError: null,
   apiState: null,
-  currentAccount: null,
+  currentAccount: getCurrentAccountFromSession(),
 }
 
 const registry = new TypeRegistry()
@@ -150,6 +160,7 @@ const SubstrateContextProvider = props => {
   }, [state, dispatch])
 
   function setCurrentAccount(acct) {
+    sessionStorage.setItem('currentAccount', JSON.stringify(acct));
     dispatch({ type: 'SET_CURRENT_ACCOUNT', payload: acct })
   }
 

@@ -2,8 +2,8 @@ import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import { ApiPromise, WsProvider } from "@polkadot/api";
 import React, { useState, useEffect } from "react";
+import { useSubstrateState } from "../substrate-lib";
 
 function Header({ tokenLogo, tokenName }) {
   return (
@@ -46,7 +46,7 @@ function Header({ tokenLogo, tokenName }) {
   );
 }
 
-function Body({ balance, tokenAbbreviation }) {
+function Body({ supply, tokenAbbreviation }) {
   return (
     <Grid
       container
@@ -56,7 +56,7 @@ function Body({ balance, tokenAbbreviation }) {
     >
       <Grid item sx={{ marginLeft: 5, }}>
         <Typography variant="h4" component="h3" sx={{ fontSize: "3rem" }}>
-          {balance}
+          {supply}
         </Typography>
       </Grid>
       <Grid item>
@@ -69,60 +69,38 @@ function Body({ balance, tokenAbbreviation }) {
 }
 
 function SupplyCard(props) {
-  const [balance, setBalance] = useState(null);
-  const [api, setApi] = useState(null);
+  const [supply, setSupply] = useState(null);
+  const { api } = useSubstrateState()
 
   useEffect(() => {
-    const setupApi = async () => {
-      const wsProvider = new WsProvider("ws://127.0.0.1:9944");
-      const api = await ApiPromise.create({ provider: wsProvider });
-      setApi(api);
-    };
+    const fetchSupply = async () => {
+      console.log("Fetching supply... for ", api);
 
-    setupApi();
-
-    return () => {
-      api && api.disconnect(); // Close the WebSocket connection when component is unmounted
-    };
-  }, []);
-
-  useEffect(() => {
-    const fetchBalance = async () => {
       if (!api) return; // Ensure the API is set before fetching
 
       const assetId = 0;
 
       try {
         const result = await api.query.assets.asset(assetId);
-        // console.log(result);
-        // console.log("Full result:", JSON.stringify(result, null, 2));
-        // console.log("Type of result:", typeof result);
-        // console.log("Type of result.balance:", typeof result["supply"]);
         const jsonResult = result.toJSON();
-        // console.log(jsonResult);
-        // console.log(jsonResult.supply);
-        // console.log("Type of jsonResult.balance:", typeof jsonResult.supply);
 
 
-        if (jsonResult && jsonResult.supply !== undefined) { // Check if balance is not undefined
-          // const humanReadableBalance = (typeof result.balance.toHuman === 'function')
-          //   ? result.balance.toHuman()
-          //   : result.balance.toString(); // If toHuman isn't available, just convert the balance to string
-
-          setBalance(jsonResult.supply);
+        if (jsonResult && jsonResult.supply !== undefined) { // Check if Supply is not undefined
+          setSupply(jsonResult.supply);
         } else {
           console.warn(
-            "Unable to retrieve the 'free' balance or the result is unexpected."
+            "Unable to retrieve the 'free' balance or the result is unexpected. (supplyCard)"
           );
 
         }
       } catch (error) {
-        console.error("Error fetching account balance:", error);
+        console.error("Error fetching account balance: (supplyCard)", error);
       }
     };
 
-    fetchBalance();
-  }, [props.address, api]);
+    fetchSupply();
+  }, [api]);
+
   return (
     <Card sx={{ backgroundColor: "#171717", borderRadius: "30px" }}>
       <Box
@@ -140,7 +118,7 @@ function SupplyCard(props) {
           />
         </Box>
         <Box>
-          <Body balance={balance} tokenAbbreviation="ETH" />
+          <Body supply={supply} tokenAbbreviation="ETH" />
         </Box>
       </Box>
     </Card>

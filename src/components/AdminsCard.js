@@ -1,62 +1,24 @@
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
-// import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-// import { ApiPromise, WsProvider } from "@polkadot/api";
 import React, { useState, useEffect } from "react";
 import { List, ListItemButton, ListItemText, Stack } from "@mui/material";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import FolderIcon from "@mui/icons-material/Folder";
 import { Divider } from "semantic-ui-react";
-import { ApiPromise, WsProvider } from "@polkadot/api";
 import { TxButton } from "../substrate-lib/components";
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-// import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useUser } from './UserContext'
-import axios from 'axios'
-import { useSubstrate } from '../substrate-lib'
-
-
-// const apiResponse = [
-//   [
-//     [0, "5FH7TJCApjJ3x79xfYe83M2a1LUbHtWkzhnq2GvN8kZq7FQT"],
-//     null
-//   ],
-//   [
-//     [0, "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"],
-//     null
-//   ]
-// ];
-
-function Header({ tokenLogo, tokenName }) {
-  return (
-    <Box
-      display="flex"
-      justifyContent="center"
-    >
-      <Typography variant="h1" component="h1" sx={{ fontSize: "2.5rem" }}>
-        Community Leadership
-      </Typography>
-    </Box>
-
-  );
-}
+import { useSubstrateState } from "../substrate-lib";
 
 function AddAdminDialog() {
   const [open, setOpen] = React.useState(false);
   const [status, setStatus] = useState(null)
-  const [userAddress, setUserAddress] = useState('')
-  const { loggedInUser } = useUser()
-  const {
-    setCurrentAccount,
-    state: { keyring, currentAccount },
-  } = useSubstrate()
   const [newAdmin, setNewAdmin] = useState('');
 
   const handleClickOpen = () => {
@@ -70,33 +32,6 @@ function AddAdminDialog() {
   const handleInputChange = (event) => {
     setNewAdmin(event.target.value);
   };
-
-  useEffect(() => {
-    const fetchUserAddress = async () => {
-      try {
-        console.log(`Fetching address for user: ${loggedInUser}`)
-
-        if (loggedInUser) {
-          console.log(loggedInUser)
-          const response = await axios.get(
-            `http://localhost:3001/getAddress/${loggedInUser}`
-          )
-          setUserAddress(response.data.address)
-        }
-      } catch (error) {
-        console.error('Failed to fetch address:', error)
-      }
-    }
-
-    fetchUserAddress()
-  }, [loggedInUser])
-
-  useEffect(() => {
-    if (userAddress && !currentAccount) {
-      setCurrentAccount(userAddress);
-      console.log(`Set current account to ${userAddress}`)
-    }
-  }, [currentAccount, setCurrentAccount, keyring, userAddress])
 
   const communityId = 0;
 
@@ -138,12 +73,6 @@ function AddAdminDialog() {
 function RemoveAdminDialog() {
   const [open, setOpen] = React.useState(false);
   const [status, setStatus] = useState(null)
-  const [userAddress, setUserAddress] = useState('')
-  const { loggedInUser } = useUser()
-  const {
-    setCurrentAccount,
-    state: { keyring, currentAccount },
-  } = useSubstrate()
   const [removeAdmin, setRemoveAdmin] = useState('');
 
   const handleClickOpen = () => {
@@ -157,33 +86,6 @@ function RemoveAdminDialog() {
   const handleInputChange = (event) => {
     setRemoveAdmin(event.target.value);
   };
-
-  useEffect(() => {
-    const fetchUserAddress = async () => {
-      try {
-        console.log(`Fetching address for user: ${loggedInUser}`)
-
-        if (loggedInUser) {
-          console.log(loggedInUser)
-          const response = await axios.get(
-            `http://localhost:3001/getAddress/${loggedInUser}`
-          )
-          setUserAddress(response.data.address)
-        }
-      } catch (error) {
-        console.error('Failed to fetch address:', error)
-      }
-    }
-
-    fetchUserAddress()
-  }, [loggedInUser])
-
-  useEffect(() => {
-    if (userAddress && !currentAccount) {
-      setCurrentAccount(userAddress);
-      console.log(`Set current account to ${userAddress}`)
-    }
-  }, [currentAccount, setCurrentAccount, keyring, userAddress])
 
   const communityId = 0;
 
@@ -222,34 +124,11 @@ function RemoveAdminDialog() {
   );
 }
 
-// function Body({ balance, tokenAbbreviation }) {
-//   return (
-//     <Grid
-//       container
-//       spacing={1}
-//       justifyContent={"center"}
-//       alignItems={"baseline"}
-//     >
-//       <Grid item>
-//         <Typography variant="h4" component="h3" sx={{ fontSize: "3rem" }}>
-//           {balance}
-//         </Typography>
-//       </Grid>
-//       <Grid item>
-//         <Typography variant="subtitle2" component="h3">
-//           {tokenAbbreviation}
-//         </Typography>
-//       </Grid>
-//     </Grid>
-//   );
-// }
 
 function AdminsCard(props) {
-  // const [balance, setBalance] = useState(null);
-  // const [api, setApi] = useState(null);
   const [communityHead, setCommunityHead] = useState('')
-  const [api, setApi] = useState(null);
   const [items, setItems] = useState([]);
+  const { api } = useSubstrateState();
 
 
   useEffect(() => {
@@ -260,19 +139,9 @@ function AdminsCard(props) {
 
       try {
         const allKeys = await api.query.communities.admins.keys(communityId);
-        // console.log("Community Keys", allKeys);
+
         const adminAccountIds = allKeys.map(({ args: [, accountId] }) => accountId.toString());
-        // console.log("Admin Account Ids", adminAccountIds);
 
-        // const adminAccountIds = allKeys.map(({ args: [, accountId] }) => accountId);
-        // const result = await api.query.communities.admins(communityId);
-        // console.log(result);
-        // console.log("Community Full result:", JSON.stringify(result, null, 2));
-        // const jsonResult = result.toJSON();
-        // console.log(jsonResult);
-
-        // const extractedItems = jsonResult.map(result => result[0][1]);
-        // console.log(extractedItems);
         setItems(adminAccountIds);
 
       } catch (error) {
@@ -284,68 +153,35 @@ function AdminsCard(props) {
   }, [api]);
 
   useEffect(() => {
-    const setupApi = async () => {
-      const wsProvider = new WsProvider("ws://127.0.0.1:9944");
-      const api = await ApiPromise.create({ provider: wsProvider });
-      setApi(api);
-    };
-
-    setupApi();
-
-    return () => {
-      api && api.disconnect(); // Close the WebSocket connection when component is unmounted
-    };
-  }, []);
-
-  useEffect(() => {
     const fetchCommunityHead = async () => {
-      if (!api) return; // Ensure the API is set before fetching
+      if (!api) {
+        console.log("No API");
+        return;
+      } // Ensure the API is set before fetching
 
       const communityId = 0;
 
       try {
         const result = await api.query.communities.communities(communityId);
-        // console.log(result);
-        // console.log("Community Full result:", JSON.stringify(result, null, 2));
         const jsonResult = result.toJSON();
-        // console.log(jsonResult);
-        // console.log(jsonResult.head);
-        // console.log("Type of jsonResult.fund:", typeof jsonResult.head);
 
-        if (jsonResult && jsonResult.head !== undefined) { // Check if balance is not undefined
-          // const humanReadableBalance = (typeof result.balance.toHuman === 'function')
-          //   ? result.balance.toHuman()
-          //   : result.balance.toString(); // If toHuman isn't available, just convert the balance to string
 
+        if (jsonResult && jsonResult.head !== undefined) {
           setCommunityHead(jsonResult.head);
         } else {
           console.warn(
-            "Unable to retrieve the 'free' balance or the result is unexpected."
+            "Unable to set the Community Head"
           );
 
         }
       } catch (error) {
-        console.error("Error fetching fund account:", error);
+        console.error("Error fetching community (AdminsCard)", error);
       }
     };
 
     fetchCommunityHead();
   }, [api]);
 
-
-  // useEffect(() => {
-  //   const setupApi = async () => {
-  //     const wsProvider = new WsProvider("ws://127.0.0.1:9944");
-  //     const api = await ApiPromise.create({ provider: wsProvider });
-  //     setApi(api);
-  //   };
-
-  //   setupApi();
-
-  //   return () => {
-  //     api && api.disconnect(); // Close the WebSocket connection when component is unmounted
-  //   };
-  // }, []);
 
 
   return (
@@ -358,8 +194,14 @@ function AdminsCard(props) {
         minWidth={290}
       >
         <Box>
-          <Header
-          />
+          <Box
+            display="flex"
+            justifyContent="center"
+          >
+            <Typography variant="h1" component="h1" sx={{ fontSize: "2.5rem" }}>
+              Community Leadership
+            </Typography>
+          </Box>
         </Box>
         <Box paddingLeft={2}>
           <Box

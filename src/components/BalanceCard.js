@@ -59,7 +59,7 @@ function Body({ balance, tokensymbol }) {
   );
 }
 
-function BalanceCard({ address, assetId, balance }) {
+function BalanceCard({ assetId, balance }) {
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const { api } = useSubstrateState()

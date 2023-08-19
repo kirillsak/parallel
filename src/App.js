@@ -25,33 +25,17 @@ import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
 import SupplyCard from './components/SupplyCard';
 import { useState } from 'react';
-// import Dialog from '@mui/material/Dialog';
-// import DialogContent from '@mui/material/DialogContent';
-// import DialogContentText from '@mui/material/DialogContentText';
-// import DialogTitle from '@mui/material/DialogTitle';
+
 
 import { SubstrateContextProvider, useSubstrateState } from './substrate-lib'
 import { DeveloperConsole } from './substrate-lib/components'
-// import AuthComponent from './components/Authorisation.jsx'
 import { UserProvider } from './components/UserContext'
 // import Interactor from './Interactor'
 import BalancesSection from './components/BalancesSection'
-// import { Stack } from '@mui/material';
 import TreasuryBalancesSection from './components/TreasuryBalancesSection';
 import AdminsCard from './components/AdminsCard';
 import AuthComponent2 from './components/NewAuthorisation';
-/*
-import AccountSelector from './AccountSelector'
-import Balances from './Balances'
-import BlockNumber from './BlockNumber'
-import Events from './Events'
-import Interactor from './Interactor'
-import Metadata from './Metadata'
-import NodeInfo from './NodeInfo'
-import TemplateModule from './TemplateModule'
-import Transfer from './Transfer'
-import Upgrade from './Upgrade'
-*/
+
 
 const drawerWidth = 160;
 
@@ -92,7 +76,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme({
   palette: {
     primary: {
@@ -139,6 +122,8 @@ function Main() {
   const { apiState, apiError, keyringState } = useSubstrateState()
   const [open, setOpen] = useState(true);
   const [dashboardView, setDashboardView] = useState('user');
+  // const [adminCommunities, setAdminCommunities] = useState([]);
+  // const [selectedCommunity, setSelectedCommunity] = useState(null);
   const toggleDrawer = () => {
     setOpen(!open);
   };

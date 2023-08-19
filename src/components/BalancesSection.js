@@ -4,37 +4,13 @@ import NativeBalanceCard from './NativeBalanceCard'
 import BalanceCard from './BalanceCard'
 import React, { useState, useEffect } from 'react'
 import { useSubstrateState } from '../substrate-lib'
-
-import axios from 'axios'
 import { useUser } from './UserContext'
 
 function BalancesSection() {
-  const [userAddress, setUserAddress] = useState('')
   const { loggedInUser } = useUser()
-  const { api } = useSubstrateState()
+  const { api, currentAccount } = useSubstrateState()
   const [assetIds, setAssetIds] = useState([]);
   const [balances, setBalances] = useState({});
-
-
-  useEffect(() => {
-    const fetchUserAddress = async () => {
-      try {
-        console.log(`Fetching address for user: ${loggedInUser}`)
-
-        if (loggedInUser) {
-          console.log(loggedInUser)
-          const response = await axios.get(
-            `http://localhost:3001/getAddress/${loggedInUser}`
-          )
-          setUserAddress(response.data.address)
-        }
-      } catch (error) {
-        console.error('Failed to fetch address:', error)
-      }
-    }
-
-    fetchUserAddress()
-  }, [loggedInUser])
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -42,15 +18,15 @@ function BalancesSection() {
 
       try {
         const allKeys = await api.query.assets.asset.keys();
-        console.log("all keys", JSON.stringify(allKeys, null, 2));
+        // console.log("all keys", JSON.stringify(allKeys, null, 2));
         const fetchedAssetIds = allKeys.map((key) => key.args[0].toNumber());
-        console.log("assetIds", fetchedAssetIds);
+        // console.log("assetIds", fetchedAssetIds);
 
         let fetchedBalances = {};
         for (let assetId of fetchedAssetIds) {
-          const result = await api.query.assets.account(assetId, userAddress);
+          const result = await api.query.assets.account(assetId, currentAccount);
           const jsonResult = result.toJSON();
-          console.log("jsonResult Balance for", assetId, " is ", jsonResult);
+          // console.log("jsonResult Balance for", assetId, " is ", jsonResult);
 
           if (jsonResult && jsonResult.balance !== undefined) {
             fetchedBalances[assetId] = jsonResult.balance;
@@ -72,8 +48,7 @@ function BalancesSection() {
     };
 
     fetchAssets();
-  }, [api, userAddress]);
-
+  }, [api, currentAccount]);
 
 
   return (
@@ -106,12 +81,12 @@ function BalancesSection() {
       <Box>
         <Grid container spacing={2}>
           <Grid item>
-            <NativeBalanceCard address={userAddress} />
+            <NativeBalanceCard address={currentAccount} />
           </Grid>
           {assetIds.map((assetId) => (
             balances[assetId] && balances[assetId] > 0 ? (
               <Grid item key={assetId}>
-                <BalanceCard address={userAddress} assetId={assetId} balance={balances[assetId]} />
+                <BalanceCard address={currentAccount} assetId={assetId} balance={balances[assetId]} />
               </Grid>
             ) : null
           ))}

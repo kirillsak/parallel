@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 // import { Keyring } from "@polkadot/keyring";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
@@ -13,7 +13,8 @@ import Avatar from "@mui/material/Avatar";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from "@mui/material/IconButton";
-import { useSubstrate } from '../substrate-lib'
+import { useSubstrate } from '../substrate-lib';
+
 
 function AuthComponent2() {
   const storedUser = sessionStorage.getItem("loggedInUser");
@@ -32,47 +33,75 @@ function AuthComponent2() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!storedUser);
   const [anchorEl, setAnchorEl] = useState(null);
 
+  const {
+    setCurrentAccount, keyring,
+  } = useSubstrate()
 
-  useEffect(() => {
-    if (storedUser && !isLoggedIn) {
-      setLoggedInUser(storedUser);
-      setIsLoggedIn(true);
-    }
-  }, []);
-
+  // Opens the dropdown menu from the avatar button
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
+  // Closes the dropdown menu
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const {
-    state: { keyring },
-  } = useSubstrate()
+  const handleOpenLogin = () => {
+    setDialogType('login');
+    setOpenDialog(true);
+  };
 
+  const handleOpenSignup = () => {
+    setDialogType('signup');
+    setOpenDialog(true);
+  };
 
   const handleLogin = async () => {
     try {
+      // Sending the username and password to a login endpoint
       const response = await axios.post("http://localhost:3001/login", {
         username,
         password,
       });
       setLoggedInUser(username);
-      setMessage(response.data.message);
       setIsLoggedIn(true); // Update the logged-in state
       sessionStorage.setItem("loggedInUser", username);
+      setMessage(response.data.message);
 
+      const response2 = await axios.get(
+        `http://localhost:3001/getAddress/${username}`
+      )
 
-      console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
+      setCurrentAccount(response2.data.address);
+
     } catch (error) {
       setMessage(error.response.data.message);
     }
   };
 
 
-  const handleSignup = async () => {
+
+  const handleCreate = () => {
+    const account = createAccount();
+    setAccountInfo(account);
+    setInitiateSignup(true);
+  };
+
+  const createAccount = () => {
+    const newMnemonic = mnemonicGenerate();
+    const { pair, json } = keyring.addUri(newMnemonic, 'myStr0ngP@ssworD', { name: username });
+    console.log(json);
+    // console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
+
+    const address = pair.address;
+    setAddress(address);
+    setMnemonic(newMnemonic);
+    return { address, mnemonic: newMnemonic, name: pair.meta.name };
+  };
+
+
+  const handleSignup = useCallback(async () => {
     try {
       const response = await axios.post("http://localhost:3001/register", {
         username,
@@ -85,59 +114,16 @@ function AuthComponent2() {
     } catch (error) {
       setMessage(error.response.data.message);
     }
-  };
+  }, [username, email, password, address, mnemonic]);
 
-  const createAccount = () => {
-    // console.log('All key pairs before keyring', JSON.stringify(keyring.getPairs()));
-    // const keyring = new Keyring({ type: "sr25519" });
-
-    // console.log('All key pairs before adding', JSON.stringify(keyring.getPairs()));
-    const newMnemonic = mnemonicGenerate();
-    // console.log(keyring);
-    // const allPropertiesAndMethods = [
-    //   ...Object.getOwnPropertyNames(keyring),
-    //   ...Object.getOwnPropertyNames(Object.getPrototypeOf(keyring))
-    // ];
-    // console.log(allPropertiesAndMethods);
-    // const pair = keyring.createFromUri(newMnemonic, { name: username }, "sr25519"); // Add the name as meta
-    const { pair, json } = keyring.addUri(newMnemonic, 'myStr0ngP@ssworD', { name: username });
-    console.log(json);
-
-    // Store this pair in your application's keyring
-    // keyring.addPair(pair);
-
-    console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
-
-    const address = pair.address;
-    setAddress(address);
-    setMnemonic(newMnemonic);
-    setInitiateSignup(true);
-    return { address, mnemonic: newMnemonic, name: pair.meta.name };
-  };
-
-  const handleCreate = () => {
-    const account = createAccount();
-    setAccountInfo(account);
-    // Now, initiate the signup process
-    setInitiateSignup(true);
-  };
 
   useEffect(() => {
     if (initiateSignup) {
       handleSignup();
-      setInitiateSignup(false); // Reset for future signups
+      setInitiateSignup(false);
     }
-  }, [initiateSignup]);
+  }, [initiateSignup, handleSignup]);
 
-  const handleOpenLogin = () => {
-    setDialogType('login');
-    setOpenDialog(true);
-  };
-
-  const handleOpenSignup = () => {
-    setDialogType('signup');
-    setOpenDialog(true);
-  };
 
   const handleSignOut = () => {
     // Reset the user's state
@@ -149,11 +135,38 @@ function AuthComponent2() {
     setMessage("");
     setLoggedInUser(null); // assuming the useUser context handles this appropriately
     setIsLoggedIn(false);
+    setCurrentAccount(null);
     sessionStorage.removeItem("loggedInUser");
     handleClose(); // close the dropdown menu
 
     window.location.reload();
   };
+
+  // const handleSignup = async () => {
+  //   try {
+  //     const response = await axios.post("http://localhost:3001/register", {
+  //       username,
+  //       email,
+  //       password,
+  //       address,
+  //       mnemonic,
+  //     });
+  //     setMessage(response.data.message);
+  //   } catch (error) {
+  //     setMessage(error.response.data.message);
+  //   }
+  // };
+
+
+  // useEffect(() => {
+  //   if (initiateSignup) {
+  //     handleSignup();
+  //     setInitiateSignup(false); // Reset for future signups
+  //   }
+  // }, [initiateSignup]);
+
+
+
 
   return (
     <div>
