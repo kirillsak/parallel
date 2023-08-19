@@ -1,41 +1,48 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 // import { Keyring } from "@polkadot/keyring";
-import { mnemonicGenerate } from "@polkadot/util-crypto";
-import { useUser } from "./UserContext";
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import IconButton from "@mui/material/IconButton";
-import { useSubstrate } from '../substrate-lib';
-
+import { mnemonicGenerate } from '@polkadot/util-crypto'
+import { useUser } from './UserContext'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import Avatar from '@mui/material/Avatar'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import IconButton from '@mui/material/IconButton'
+import { useSubstrate } from '../substrate-lib'
 
 function AuthComponent2() {
-  const storedUser = sessionStorage.getItem("loggedInUser");
+  const storedUser = sessionStorage.getItem('loggedInUser')
 
-  const [initiateSignup, setInitiateSignup] = useState(false);
-  const [accountInfo, setAccountInfo] = useState({});
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [address, setAddress] = useState("");
-  const [mnemonic, setMnemonic] = useState("");
-  const [message, setMessage] = useState("");
-  const { loggedInUser, setLoggedInUser } = useUser();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dialogType, setDialogType] = useState('login'); // 'login' or 'signup'
-  const [isLoggedIn, setIsLoggedIn] = useState(!!storedUser);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [initiateSignup, setInitiateSignup] = useState(false)
+  const [accountInfo, setAccountInfo] = useState({})
+  const [username, setUsername] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [address, setAddress] = useState('')
+  const [mnemonic, setMnemonic] = useState('')
+  const [message, setMessage] = useState('')
+  //const { loggedInUser, setLoggedInUser } = useUser()
+  const { loggedInUser, setLoggedInUser, profileImage, setProfileImage } =
+    useUser()
 
   const {
     setCurrentAccount, keyring,
   } = useSubstrate()
+  const [openDialog, setOpenDialog] = useState(false)
+  const [dialogType, setDialogType] = useState('login') // 'login' or 'signup'
+  const [isLoggedIn, setIsLoggedIn] = useState(!!storedUser)
+  const [anchorEl, setAnchorEl] = useState(null)
+  const storedProfilePicture = sessionStorage.getItem('profilePicture')
+  const [profilePicture, setProfilePicture] = useState(
+    storedProfilePicture || null
+  )
 
   // Opens the dropdown menu from the avatar button
   const handleClick = (event) => {
@@ -44,8 +51,8 @@ function AuthComponent2() {
 
   // Closes the dropdown menu
   const handleClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
   const handleOpenLogin = () => {
     setDialogType('login');
@@ -63,12 +70,15 @@ function AuthComponent2() {
       const response = await axios.post("http://localhost:3001/login", {
         username,
         password,
-      });
-      setLoggedInUser(username);
-      setIsLoggedIn(true); // Update the logged-in state
+      })
+      setLoggedInUser(username)
+      setMessage(response.data.message)
+      setIsLoggedIn(true) // Update the logged-in state
+      const profilePicResponse = await axios.get(
+        `http://localhost:3001/getProfilePic/${username}`
+      )
+      setProfilePicture(profilePicResponse.data.profilePic)
       sessionStorage.setItem("loggedInUser", username);
-      setMessage(response.data.message);
-
       const response2 = await axios.get(
         `http://localhost:3001/getAddress/${username}`
       )
@@ -76,11 +86,9 @@ function AuthComponent2() {
       setCurrentAccount(response2.data.address);
 
     } catch (error) {
-      setMessage(error.response.data.message);
+      setMessage(error.response.data.message)
     }
-  };
-
-
+  }
 
   const handleCreate = () => {
     const account = createAccount();
@@ -92,7 +100,6 @@ function AuthComponent2() {
     const newMnemonic = mnemonicGenerate();
     const { pair, json } = keyring.addUri(newMnemonic, 'myStr0ngP@ssworD', { name: username });
     console.log(json);
-    // console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
 
     const address = pair.address;
     setAddress(address);
@@ -101,28 +108,69 @@ function AuthComponent2() {
   };
 
 
-  const handleSignup = useCallback(async () => {
+  const handleSignup = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/register", {
+      const response = await axios.post('http://localhost:3001/register', {
         username,
+        firstName,
+        lastName,
         email,
         password,
         address,
         mnemonic,
-      });
-      setMessage(response.data.message);
+      })
+      setMessage(response.data.message)
     } catch (error) {
-      setMessage(error.response.data.message);
+      setMessage(error.response.data.message)
     }
-  }, [username, email, password, address, mnemonic]);
+  }
+
+  const handleUploadClick = e => {
+    const input = document.getElementById('profile-picture-upload')
+    input.click()
+  }
+
+  const handleProfilePictureChange = async e => {
+    const file = e.target.files[0]
+    setProfilePicture(URL.createObjectURL(file))
+
+    const formData = new FormData()
+    formData.append('profilePic', file)
+
+    formData.append('username', username)
+
+    try {
+      const response = await axios.post(
+        'http://localhost:3001/uploadProfilePic',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+
+      // The backend responds with the saved image's URL or relative path.
+
+      // Save this imageUrl to the user's state:
+      const backendURL = 'http://localhost:3001' // or wherever your backend is hosted
+      const completeImageUrl = backendURL + response.data.imageUrl
+      setProfileImage(completeImageUrl) // Update the context
+      sessionStorage.setItem('profilePicture', completeImageUrl) // Update the sessionStorage
+      setProfilePicture(completeImageUrl)
+    } catch (error) {
+      console.log('Failed to upload image:', error)
+    }
+  },
 
 
-  useEffect(() => {
-    if (initiateSignup) {
-      handleSignup();
-      setInitiateSignup(false);
-    }
-  }, [initiateSignup, handleSignup]);
+    useEffect(() => {
+      if (initiateSignup) {
+        handleSignup();
+        setInitiateSignup(false);
+      }
+    }, [initiateSignup, handleSignup]);
+
 
 
   const handleSignOut = () => {
@@ -139,42 +187,18 @@ function AuthComponent2() {
     sessionStorage.removeItem("loggedInUser");
     handleClose(); // close the dropdown menu
 
-    window.location.reload();
-  };
-
-  // const handleSignup = async () => {
-  //   try {
-  //     const response = await axios.post("http://localhost:3001/register", {
-  //       username,
-  //       email,
-  //       password,
-  //       address,
-  //       mnemonic,
-  //     });
-  //     setMessage(response.data.message);
-  //   } catch (error) {
-  //     setMessage(error.response.data.message);
-  //   }
-  // };
-
-
-  // useEffect(() => {
-  //   if (initiateSignup) {
-  //     handleSignup();
-  //     setInitiateSignup(false); // Reset for future signups
-  //   }
-  // }, [initiateSignup]);
-
-
-
+    window.location.reload()
+  }
 
   return (
     <div>
       {isLoggedIn ? (
         <div>
           <IconButton onClick={handleClick}>
-            <Avatar>
-              {loggedInUser.charAt(0).toUpperCase()}
+            <Avatar src={profilePicture || profileImage}>
+              {!profileImage && !profilePicture
+                ? loggedInUser.charAt(0).toUpperCase()
+                : null}
             </Avatar>
           </IconButton>
           <Menu
@@ -182,7 +206,18 @@ function AuthComponent2() {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleSignOut} sx={{ color: 'black' }} >
+            <MenuItem onClick={handleUploadClick} sx={{ color: 'black' }}>
+              <input
+                type="file"
+                style={{ display: 'none' }}
+                id="profile-picture-upload"
+                onChange={handleProfilePictureChange}
+              />
+              <label htmlFor="profile-picture-upload">
+                Upload Profile Picture
+              </label>
+            </MenuItem>
+            <MenuItem onClick={handleSignOut} sx={{ color: 'black' }}>
               <Button variant="outlined" color="primary">
                 Sign Out
               </Button>
@@ -191,10 +226,19 @@ function AuthComponent2() {
         </div> // Display an avatar with the first character of the username
       ) : (
         <>
-          <Button variant="contained" sx={{ borderRadius: '50px' }} color="primary" onClick={handleOpenLogin}>
+          <Button
+            variant="contained"
+            sx={{ borderRadius: '50px' }}
+            color="primary"
+            onClick={handleOpenLogin}
+          >
             Login
           </Button>
-          <Button variant="outlined" sx={{ borderRadius: '50px' }} onClick={handleOpenSignup}>
+          <Button
+            variant="outlined"
+            sx={{ borderRadius: '50px' }}
+            onClick={handleOpenSignup}
+          >
             Signup
           </Button>
         </>
@@ -207,16 +251,34 @@ function AuthComponent2() {
             fullWidth
             label="Username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             inputProps={{ style: { color: 'black' } }}
           />
+          {dialogType === 'signup' && (
+            <TextField
+              fullWidth
+              label="First Name"
+              value={firstName}
+              onChange={e => setFirstName(e.target.value)}
+              inputProps={{ style: { color: 'black' } }}
+            />
+          )}
+          {dialogType === 'signup' && (
+            <TextField
+              fullWidth
+              label="Last Name"
+              value={lastName}
+              onChange={e => setLastName(e.target.value)}
+              inputProps={{ style: { color: 'black' } }}
+            />
+          )}
           {dialogType === 'signup' && (
             <TextField
               fullWidth
               type="email"
               label="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               inputProps={{ style: { color: 'black' } }}
             />
           )}
@@ -225,12 +287,11 @@ function AuthComponent2() {
             type="password"
             label="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             inputProps={{ style: { color: 'black' } }}
           />
-          <Typography color="error">
-            {message}
-          </Typography>
+
+          <Typography color="error">{message}</Typography>
           {dialogType === 'login' ? (
             <Button color="primary" onClick={handleLogin}>
               Login
@@ -255,7 +316,7 @@ function AuthComponent2() {
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default AuthComponent2;
+export default AuthComponent2
