@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 // import { Keyring } from "@polkadot/keyring";
 import { mnemonicGenerate } from '@polkadot/util-crypto'
@@ -161,15 +161,15 @@ function AuthComponent2() {
     } catch (error) {
       console.log('Failed to upload image:', error)
     }
-  },
+  }
 
 
-    useEffect(() => {
-      if (initiateSignup) {
-        handleSignup();
-        setInitiateSignup(false);
-      }
-    }, [initiateSignup, handleSignup]);
+  useEffect(() => {
+    if (initiateSignup) {
+      handleSignup();
+      setInitiateSignup(false);
+    }
+  }, [initiateSignup, handleSignup]);
 
 
 
