@@ -42,7 +42,8 @@ function AuthComponent2() {
   // )
 
   const {
-    setCurrentAccount, keyring,
+    setCurrentAccount,
+    state: { keyring },
   } = useSubstrate()
 
   // Opens the dropdown menu from the avatar button
@@ -192,6 +193,10 @@ function AuthComponent2() {
     window.location.reload()
   }
 
+  const resetAccountInfo = () => {
+    setAccountInfo({});
+  };
+
   return (
     <div>
       {isLoggedIn ? (
@@ -249,8 +254,14 @@ function AuthComponent2() {
         </>
       )}
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>{dialogType === 'login' ? 'Login' : 'Signup'}</DialogTitle>
+      <Dialog
+        open={openDialog}
+        onClose={() => {
+          setOpenDialog(false);
+          resetAccountInfo();
+        }}
+      >
+        <DialogTitle style={{ color: 'black' }}>{dialogType === 'login' ? 'Login' : 'Signup'}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -306,21 +317,23 @@ function AuthComponent2() {
               Signup
             </Button>
           )}
+
+          {accountInfo.address && (
+            <div>
+              <h3 style={{ color: 'black' }}>New Account Created!</h3>
+              <p style={{ color: 'black' }}>Name: {accountInfo.name}</p>
+              <p style={{ color: 'black' }}>Address: {accountInfo.address}</p>
+              <p style={{ color: 'black' }}>Mnemonic: {accountInfo.mnemonic}</p>
+              <strong style={{ color: 'black' }}>
+                Save your mnemonic safely! It's crucial for account recovery.
+              </strong>
+            </div>
+          )}
+
         </DialogContent>
       </Dialog>
-
-      {accountInfo.address && (
-        <div>
-          <h3>New Account Created!</h3>
-          <p>Name: {accountInfo.name}</p>
-          <p>Address: {accountInfo.address}</p>
-          <p>Mnemonic: {accountInfo.mnemonic}</p>
-          <strong>
-            Save your mnemonic safely! It's crucial for account recovery.
-          </strong>
-        </div>
-      )}
     </div>
+
   )
 }
 
