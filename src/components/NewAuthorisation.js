@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 // import { Keyring } from "@polkadot/keyring";
 import { mnemonicGenerate } from '@polkadot/util-crypto'
@@ -28,21 +28,22 @@ function AuthComponent2() {
   const [address, setAddress] = useState('')
   const [mnemonic, setMnemonic] = useState('')
   const [message, setMessage] = useState('')
-  //const { loggedInUser, setLoggedInUser } = useUser()
-  const { loggedInUser, setLoggedInUser, profileImage, setProfileImage } =
-    useUser()
-
-  const {
-    setCurrentAccount, keyring,
-  } = useSubstrate()
+  const { loggedInUser, setLoggedInUser } = useUser()
+  // const { loggedInUser, setLoggedInUser, profileImage, setProfileImage } =
+  //   useUser()
   const [openDialog, setOpenDialog] = useState(false)
   const [dialogType, setDialogType] = useState('login') // 'login' or 'signup'
   const [isLoggedIn, setIsLoggedIn] = useState(!!storedUser)
   const [anchorEl, setAnchorEl] = useState(null)
-  const storedProfilePicture = sessionStorage.getItem('profilePicture')
-  const [profilePicture, setProfilePicture] = useState(
-    storedProfilePicture || null
-  )
+
+  // const storedProfilePicture = sessionStorage.getItem('profilePicture')
+  // const [profilePicture, setProfilePicture] = useState(
+  //   storedProfilePicture || null
+  // )
+
+  const {
+    setCurrentAccount, keyring,
+  } = useSubstrate()
 
   // Opens the dropdown menu from the avatar button
   const handleClick = (event) => {
@@ -72,13 +73,15 @@ function AuthComponent2() {
         password,
       })
       setLoggedInUser(username)
-      setMessage(response.data.message)
       setIsLoggedIn(true) // Update the logged-in state
-      const profilePicResponse = await axios.get(
-        `http://localhost:3001/getProfilePic/${username}`
-      )
-      setProfilePicture(profilePicResponse.data.profilePic)
       sessionStorage.setItem("loggedInUser", username);
+      setMessage(response.data.message)
+
+      // const profilePicResponse = await axios.get(
+      //   `http://localhost:3001/getProfilePic/${username}`
+      // )
+      // setProfilePicture(profilePicResponse.data.profilePic)
+
       const response2 = await axios.get(
         `http://localhost:3001/getAddress/${username}`
       )
@@ -107,10 +110,9 @@ function AuthComponent2() {
     return { address, mnemonic: newMnemonic, name: pair.meta.name };
   };
 
-
-  const handleSignup = async () => {
+  const handleSignup = useCallback(async () => {
     try {
-      const response = await axios.post('http://localhost:3001/register', {
+      const response = await axios.post("http://localhost:3001/register", {
         username,
         firstName,
         lastName,
@@ -118,50 +120,50 @@ function AuthComponent2() {
         password,
         address,
         mnemonic,
-      })
-      setMessage(response.data.message)
+      });
+      setMessage(response.data.message);
     } catch (error) {
-      setMessage(error.response.data.message)
+      setMessage(error.response.data.message);
     }
-  }
+  }, [username, firstName, lastName, email, password, address, mnemonic]);
 
-  const handleUploadClick = e => {
-    const input = document.getElementById('profile-picture-upload')
-    input.click()
-  }
+  // const handleUploadClick = e => {
+  //   const input = document.getElementById('profile-picture-upload')
+  //   input.click()
+  // }
 
-  const handleProfilePictureChange = async e => {
-    const file = e.target.files[0]
-    setProfilePicture(URL.createObjectURL(file))
+  // const handleProfilePictureChange = async e => {
+  //   const file = e.target.files[0]
+  //   setProfilePicture(URL.createObjectURL(file))
 
-    const formData = new FormData()
-    formData.append('profilePic', file)
+  //   const formData = new FormData()
+  //   formData.append('profilePic', file)
 
-    formData.append('username', username)
+  //   formData.append('username', username)
 
-    try {
-      const response = await axios.post(
-        'http://localhost:3001/uploadProfilePic',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      )
+  //   try {
+  //     const response = await axios.post(
+  //       'http://localhost:3001/uploadProfilePic',
+  //       formData,
+  //       {
+  //         headers: {
+  //           'Content-Type': 'multipart/form-data',
+  //         },
+  //       }
+  //     )
 
-      // The backend responds with the saved image's URL or relative path.
+  //     // The backend responds with the saved image's URL or relative path.
 
-      // Save this imageUrl to the user's state:
-      const backendURL = 'http://localhost:3001' // or wherever your backend is hosted
-      const completeImageUrl = backendURL + response.data.imageUrl
-      setProfileImage(completeImageUrl) // Update the context
-      sessionStorage.setItem('profilePicture', completeImageUrl) // Update the sessionStorage
-      setProfilePicture(completeImageUrl)
-    } catch (error) {
-      console.log('Failed to upload image:', error)
-    }
-  }
+  //     // Save this imageUrl to the user's state:
+  //     const backendURL = 'http://localhost:3001' // or wherever your backend is hosted
+  //     const completeImageUrl = backendURL + response.data.imageUrl
+  //     setProfileImage(completeImageUrl) // Update the context
+  //     sessionStorage.setItem('profilePicture', completeImageUrl) // Update the sessionStorage
+  //     setProfilePicture(completeImageUrl)
+  //   } catch (error) {
+  //     console.log('Failed to upload image:', error)
+  //   }
+  // }
 
 
   useEffect(() => {
@@ -195,10 +197,13 @@ function AuthComponent2() {
       {isLoggedIn ? (
         <div>
           <IconButton onClick={handleClick}>
-            <Avatar src={profilePicture || profileImage}>
+            {/* <Avatar src={profilePicture || profileImage}>
               {!profileImage && !profilePicture
                 ? loggedInUser.charAt(0).toUpperCase()
                 : null}
+            </Avatar> */}
+            <Avatar>
+              {loggedInUser.charAt(0).toUpperCase()}
             </Avatar>
           </IconButton>
           <Menu
@@ -206,7 +211,7 @@ function AuthComponent2() {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleUploadClick} sx={{ color: 'black' }}>
+            {/* <MenuItem onClick={handleUploadClick} sx={{ color: 'black' }}>
               <input
                 type="file"
                 style={{ display: 'none' }}
@@ -216,7 +221,7 @@ function AuthComponent2() {
               <label htmlFor="profile-picture-upload">
                 Upload Profile Picture
               </label>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem onClick={handleSignOut} sx={{ color: 'black' }}>
               <Button variant="outlined" color="primary">
                 Sign Out
