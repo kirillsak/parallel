@@ -20,7 +20,7 @@ function CommunitySelector() {
     } = useSubstrateState();
     const [communitiesInfo, setCommunitiesInfo] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
-    const { setSelectedCommunity } = useCommunity();
+    const { selectedCommunity, setSelectedCommunity } = useCommunity();
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -82,7 +82,7 @@ function CommunitySelector() {
                         onClick={handleClick}
                         endIcon={<ArrowDropDownIcon />}
                     >
-                        Select Community
+                        {selectedCommunity && selectedCommunity.name ? hexToString(selectedCommunity.name) : "Select Community"}
                     </Button>
                     <Menu
                         id="community-menu"
