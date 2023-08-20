@@ -23,7 +23,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { mainListItems } from './components/listItems';
 import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
-import SupplyCard from './components/SupplyCard';
 import { useState } from 'react';
 
 
@@ -32,8 +31,6 @@ import { DeveloperConsole } from './substrate-lib/components'
 import { UserProvider } from './components/UserContext'
 // import Interactor from './Interactor'
 import BalancesSection from './components/BalancesSection'
-import TreasuryBalancesSection from './components/TreasuryBalancesSection';
-import AdminsCard from './components/AdminsCard';
 import AuthComponent2 from './components/NewAuthorisation';
 import AdminDashboard from './components/AdminDashboard';
 
@@ -238,9 +235,6 @@ function Main() {
             {dashboardView === 'admin' && (
               <>
                 <AdminDashboard />
-                <SupplyCard />
-                <TreasuryBalancesSection />
-                <AdminsCard />
               </>
             )}
           </Box>

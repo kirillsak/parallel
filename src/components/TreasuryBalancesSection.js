@@ -5,39 +5,10 @@ import BalanceCard from './BalanceCard'
 import React, { useState, useEffect } from 'react'
 import { useSubstrateState } from '../substrate-lib'
 
-function TreasuryBalancesSection() {
-  const [communityFund, setCommunityFund] = useState('')
+function TreasuryBalancesSection({ communityFund }) {
   const { api } = useSubstrateState()
   const [assetIds, setAssetIds] = useState([]);
   const [balances, setBalances] = useState({});
-
-  useEffect(() => {
-    const fetchCommunityFund = async () => {
-      if (!api) return; // Ensure the API is set before fetching
-
-      const communityId = 0;
-
-      try {
-        const result = await api.query.communities.communities(communityId);
-        const jsonResult = result.toJSON();
-
-        if (jsonResult && jsonResult.fund !== undefined) { // Check if balance is not undefined
-          setCommunityFund(jsonResult.fund);
-          console.log("Community Fund: ", JSON.stringify(jsonResult.fund));
-        } else {
-          console.warn(
-            "Unable to retrieve the 'free' balance or the result is unexpected. (communityFund)"
-          );
-
-        }
-      } catch (error) {
-        console.error("Error fetching fund account:", error);
-      }
-    };
-
-    fetchCommunityFund();
-  }, [api]);
-
 
   useEffect(() => {
     const fetchAssets = async () => {
