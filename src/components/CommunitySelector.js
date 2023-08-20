@@ -56,6 +56,7 @@ function CommunitySelector() {
                 }
 
                 console.log("Community IDs for admin:", JSON.stringify(communitiesInfo));
+                console.log(currentAccount)
                 setCommunitiesInfo(communitiesInfo);
 
 

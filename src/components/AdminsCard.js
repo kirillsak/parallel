@@ -15,15 +15,20 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useCommunity } from './CommunityContext'
+import { useSubstrateState } from '../substrate-lib';
 
 
-function AddAdminDialog({ communityId }) {
+function AddAdminDialog() {
   const [open, setOpen] = React.useState(false);
   const [status, setStatus] = useState(null)
   const [newAdmin, setNewAdmin] = useState('');
+  const { selectedCommunity } = useCommunity()
+  const { currentAccount } = useSubstrateState()
 
   const handleClickOpen = () => {
     setOpen(true);
+    console.log(currentAccount)
+    console.log(selectedCommunity.id)
   };
 
   const handleClose = () => {
@@ -59,7 +64,7 @@ function AddAdminDialog({ communityId }) {
           <TxButton label="Submit" setStatus={setStatus} type="SIGNED-TX" attrs={{
             palletRpc: 'communities',
             callable: 'addAdmin',
-            inputParams: [communityId, newAdmin],
+            inputParams: [selectedCommunity.id, newAdmin],
             paramFields: [true, true],
           }} />
           <div style={{ overflowWrap: 'break-word', color: 'black' }}>{status}</div>
@@ -69,10 +74,11 @@ function AddAdminDialog({ communityId }) {
   );
 }
 
-function RemoveAdminDialog({ communityId }) {
+function RemoveAdminDialog() {
   const [open, setOpen] = React.useState(false);
   const [status, setStatus] = useState(null)
   const [removeAdmin, setRemoveAdmin] = useState('');
+  const { selectedCommunity } = useCommunity()
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -112,7 +118,7 @@ function RemoveAdminDialog({ communityId }) {
           <TxButton label="Submit" setStatus={setStatus} type="SIGNED-TX" attrs={{
             palletRpc: 'communities',
             callable: 'removeAdmin',
-            inputParams: [communityId, removeAdmin],
+            inputParams: [selectedCommunity.id, removeAdmin],
             paramFields: [true, true],
           }} />
           <div style={{ overflowWrap: 'break-word', color: 'black' }}>{status}</div>
