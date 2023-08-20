@@ -9,6 +9,8 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { useCommunity } from './CommunityContext';
 import { hexToString } from '@polkadot/util';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
 
 
 function CommunitySelector() {
@@ -69,22 +71,38 @@ function CommunitySelector() {
 
     return (
         <div>
-            <Button aria-controls="community-menu" aria-haspopup="true" onClick={handleClick}>
-                Select Community
-            </Button>
-            <Menu
-                id="community-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-            >
-                {communitiesInfo.map(community => (
-                    <MenuItem key={community.id} onClick={() => handleMenuItemClick(community)} sx={{ color: 'black' }}>
-                        {hexToString(community.name)}
-                    </MenuItem>
-                ))}
-            </Menu>
+            {communitiesInfo.length === 0 ? (
+                <p>You are not an admin in any communities.</p>
+            ) : (
+                <>
+                    <Button
+                        variant="outlined"
+                        aria-controls="community-menu"
+                        aria-haspopup="true"
+                        onClick={handleClick}
+                        endIcon={<ArrowDropDownIcon />}
+                    >
+                        Select Community
+                    </Button>
+                    <Menu
+                        id="community-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={handleClose}
+                    >
+                        {communitiesInfo.map(community => (
+                            <MenuItem
+                                key={community.id}
+                                onClick={() => handleMenuItemClick(community)}
+                                sx={{ color: 'black' }}
+                            >
+                                {hexToString(community.name)}
+                            </MenuItem>
+                        ))}
+                    </Menu>
+                </>
+            )}
         </div>
     );
 }
