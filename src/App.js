@@ -35,7 +35,8 @@ import BalancesSection from './components/BalancesSection'
 import TreasuryBalancesSection from './components/TreasuryBalancesSection';
 import AdminsCard from './components/AdminsCard';
 import AuthComponent2 from './components/NewAuthorisation';
-import CommunitySelector from './components/CommunitySelector.js';
+import AdminDashboard from './components/AdminDashboard';
+
 
 
 const drawerWidth = 160;
@@ -236,7 +237,7 @@ function Main() {
 
             {dashboardView === 'admin' && (
               <>
-                <CommunitySelector />
+                <AdminDashboard />
                 <SupplyCard />
                 <TreasuryBalancesSection />
                 <AdminsCard />
