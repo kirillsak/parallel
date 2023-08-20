@@ -5,19 +5,23 @@ import TreasuryBalancesSection from './TreasuryBalancesSection';
 import AdminsCard from './AdminsCard';
 import { useState, useEffect } from 'react';
 import { useSubstrateState } from '../substrate-lib';
+import { useCommunity } from './CommunityContext';
 
 function AdminDashboard() {
     const [communityFund, setCommunityFund] = useState('')
     const { api } = useSubstrateState()
+    const { selectedCommunity } = useCommunity();
+
 
     useEffect(() => {
         const fetchCommunityFund = async () => {
-            if (!api) return; // Ensure the API is set before fetching
-
-            const communityId = 0;
+            if (!api) {
+                return;
+            }  // Ensure the API is set before fetching
 
             try {
-                const result = await api.query.communities.communities(communityId);
+                console.log("Selected community: ", selectedCommunity);
+                const result = await api.query.communities.communities(selectedCommunity);
                 const jsonResult = result.toJSON();
 
                 if (jsonResult && jsonResult.fund !== undefined) { // Check if balance is not undefined
@@ -35,13 +39,13 @@ function AdminDashboard() {
         };
 
         fetchCommunityFund();
-    }, [api]);
+    }, [api, selectedCommunity]);
 
 
     return (
         <div>
             <CommunitySelector />
-            <SupplyCard assetId={0} />
+            <SupplyCard assetId={selectedCommunity} />
             <TreasuryBalancesSection communityFund={communityFund} />
             <AdminsCard />
         </div>

@@ -33,6 +33,7 @@ import { UserProvider } from './components/UserContext'
 import BalancesSection from './components/BalancesSection'
 import AuthComponent2 from './components/NewAuthorisation';
 import AdminDashboard from './components/AdminDashboard';
+import { CommunityProvider } from './components/CommunityContext';
 
 
 
@@ -234,7 +235,10 @@ function Main() {
 
             {dashboardView === 'admin' && (
               <>
-                <AdminDashboard />
+                <CommunityProvider>
+                  <AdminDashboard />
+                </CommunityProvider>
+
               </>
             )}
           </Box>

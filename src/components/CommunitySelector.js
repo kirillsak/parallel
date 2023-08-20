@@ -8,6 +8,7 @@ import { hexToString } from '@polkadot/util';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import { useCommunity } from './CommunityContext';
 
 
 function CommunitySelector() {
@@ -17,6 +18,7 @@ function CommunitySelector() {
     } = useSubstrateState();
     const [communitiesInfo, setCommunitiesInfo] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
+    const { setSelectedCommunity } = useCommunity();
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -24,6 +26,11 @@ function CommunitySelector() {
 
     const handleClose = () => {
         setAnchorEl(null);
+    };
+
+    const handleMenuItemClick = (community) => {
+        setSelectedCommunity(community);
+        handleClose();
     };
 
     useEffect(() => {
@@ -79,7 +86,7 @@ function CommunitySelector() {
                 onClose={handleClose}
             >
                 {communitiesInfo.map(community => (
-                    <MenuItem key={community.id} onClick={handleClose} sx={{ color: 'black' }}>
+                    <MenuItem key={community.id} onClick={() => handleMenuItemClick(community)} sx={{ color: 'black' }}>
                         {community.name}
                     </MenuItem>
                 ))}
