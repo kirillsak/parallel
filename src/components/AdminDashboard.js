@@ -8,7 +8,7 @@ function AdminDashboard() {
     return (
         <div>
             <CommunitySelector />
-            <SupplyCard />
+            <SupplyCard assetId={0} />
             <TreasuryBalancesSection />
             <AdminsCard />
         </div>
