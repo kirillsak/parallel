@@ -4,11 +4,11 @@ import {
     useState,
 } from 'react';
 import { useSubstrateState } from '../substrate-lib';
-import { hexToString } from '@polkadot/util';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { useCommunity } from './CommunityContext';
+import { hexToString } from '@polkadot/util';
 
 
 function CommunitySelector() {
@@ -35,9 +35,7 @@ function CommunitySelector() {
 
     useEffect(() => {
         const fetchCommunityAdmins = async () => {
-            if (!api) return; // Ensure the API is set before fetching
-
-            // console.log('All key pairs before keyring', JSON.stringify(keyring.getPairs()));
+            if (!api) return;
 
             try {
 
@@ -51,11 +49,7 @@ function CommunitySelector() {
                     const isAdmin = await api.query.communities.admins(i, currentAccount);
                     if (isAdmin.isSome) {
                         const community = await api.query.communities.communities(i);
-                        const jsonResult = community.toJSON();
-                        communitiesInfo.push({
-                            id: i,
-                            name: hexToString(jsonResult.name)
-                        });
+                        communitiesInfo.push(community.toJSON());
                     }
                 }
 
@@ -87,7 +81,7 @@ function CommunitySelector() {
             >
                 {communitiesInfo.map(community => (
                     <MenuItem key={community.id} onClick={() => handleMenuItemClick(community)} sx={{ color: 'black' }}>
-                        {community.name}
+                        {hexToString(community.name)}
                     </MenuItem>
                 ))}
             </Menu>
