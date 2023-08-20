@@ -193,10 +193,6 @@ function AuthComponent2() {
     window.location.reload()
   }
 
-  const resetAccountInfo = () => {
-    setAccountInfo({});
-  };
-
   return (
     <div>
       {isLoggedIn ? (
@@ -258,7 +254,8 @@ function AuthComponent2() {
         open={openDialog}
         onClose={() => {
           setOpenDialog(false);
-          resetAccountInfo();
+          setMessage('');
+          setAccountInfo({});
         }}
       >
         <DialogTitle style={{ color: 'black' }}>{dialogType === 'login' ? 'Login' : 'Signup'}</DialogTitle>
