@@ -23,6 +23,7 @@ function TreasuryBalancesSection() {
 
         if (jsonResult && jsonResult.fund !== undefined) { // Check if balance is not undefined
           setCommunityFund(jsonResult.fund);
+          console.log("Community Fund: ", JSON.stringify(jsonResult.fund));
         } else {
           console.warn(
             "Unable to retrieve the 'free' balance or the result is unexpected. (communityFund)"

@@ -57,18 +57,21 @@ function Body({ balance, tokenAbbreviation }) {
   );
 }
 
-function NativeBalanceCard(props) {
+function NativeBalanceCard({ accountId }) {
   const [balance, setBalance] = useState(null);
-  const { api, currentAccount } = useSubstrateState()
+  const { api, currentAccount } = useSubstrateState();
+
+  // Uses the account ID from props if present, otherwise uses the current account
+  const effectiveAccountId = accountId || currentAccount;
+
+  console.log("effectiveAccountId", effectiveAccountId);
 
   useEffect(() => {
     const fetchBalance = async () => {
       if (!api) return; // Ensure the API is set before fetching
 
       try {
-        const result = await api.query.system.account(currentAccount);
-        // console.log("Account result:", result);
-        // console.log("Account Full result:", JSON.stringify(result, null, 2));
+        const result = await api.query.system.account(effectiveAccountId);
 
         if (result && result.data && result.data.free) {
           const humanReadableBalance = result.data.free.toHuman();
@@ -84,7 +87,7 @@ function NativeBalanceCard(props) {
     };
 
     fetchBalance();
-  }, [api, currentAccount]);
+  }, [api, effectiveAccountId]);
 
 
   return (
