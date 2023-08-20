@@ -16,7 +16,7 @@ function AdminDashboard() {
                 <>
                     <SupplyCard assetId={selectedCommunity.id} />
                     <TreasuryBalancesSection communityFund={selectedCommunity.fund} />
-                    <AdminsCard communityId={selectedCommunity.id} />
+                    <AdminsCard />
                 </>
             )}
         </>

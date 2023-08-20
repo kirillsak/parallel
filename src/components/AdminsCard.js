@@ -1,7 +1,7 @@
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { List, ListItemButton, ListItemText, Stack } from "@mui/material";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
@@ -14,7 +14,8 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useSubstrateState } from "../substrate-lib";
+import { useCommunity } from './CommunityContext'
+
 
 function AddAdminDialog({ communityId }) {
   const [open, setOpen] = React.useState(false);
@@ -122,61 +123,8 @@ function RemoveAdminDialog({ communityId }) {
 }
 
 
-function AdminsCard({ communityId }) {
-  const [communityHead, setCommunityHead] = useState('')
-  const [items, setItems] = useState([]);
-  const { api } = useSubstrateState();
-
-
-  useEffect(() => {
-    const fetchCommunityAdmins = async () => {
-      if (!api) return; // Ensure the API is set before fetching
-
-      try {
-        const allKeys = await api.query.communities.admins.keys(communityId);
-
-        const adminAccountIds = allKeys.map(({ args: [, accountId] }) => accountId.toString());
-
-        setItems(adminAccountIds);
-
-      } catch (error) {
-        console.error("Error fetching community admins:", error);
-      }
-    };
-
-    fetchCommunityAdmins();
-  }, [api, communityId]);
-
-  useEffect(() => {
-    const fetchCommunityHead = async () => {
-      if (!api) {
-        console.log("No API");
-        return;
-      } // Ensure the API is set before fetching
-
-
-      try {
-        const result = await api.query.communities.communities(communityId);
-        const jsonResult = result.toJSON();
-
-
-        if (jsonResult && jsonResult.head !== undefined) {
-          setCommunityHead(jsonResult.head);
-        } else {
-          console.warn(
-            "Unable to set the Community Head"
-          );
-
-        }
-      } catch (error) {
-        console.error("Error fetching community (AdminsCard)", error);
-      }
-    };
-
-    fetchCommunityHead();
-  }, [api, communityId]);
-
-
+function AdminsCard() {
+  const { communityHead, admins } = useCommunity()
 
   return (
     <Card sx={{ backgroundColor: "#171717", borderRadius: "30px" }}>
@@ -231,7 +179,7 @@ function AdminsCard({ communityId }) {
         <Divider />
         <Box>
           <List>
-            {items.map((item, index) => (
+            {admins.map((item, index) => (
               <ListItemButton key={index} sx={{ borderRadius: '50px' }}>
                 <ListItemAvatar>
                   <Avatar>
