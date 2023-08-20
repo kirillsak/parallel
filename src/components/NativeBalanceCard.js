@@ -64,8 +64,6 @@ function NativeBalanceCard({ address }) {
   // Uses the account ID from props if present, otherwise uses the current account
   const effectiveAccountId = address || currentAccount;
 
-  console.log("effectiveAccountId", effectiveAccountId);
-
   useEffect(() => {
     const fetchBalance = async () => {
       if (!api) return; // Ensure the API is set before fetching

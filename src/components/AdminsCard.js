@@ -16,7 +16,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useSubstrateState } from "../substrate-lib";
 
-function AddAdminDialog() {
+function AddAdminDialog({ communityId }) {
   const [open, setOpen] = React.useState(false);
   const [status, setStatus] = useState(null)
   const [newAdmin, setNewAdmin] = useState('');
@@ -32,8 +32,6 @@ function AddAdminDialog() {
   const handleInputChange = (event) => {
     setNewAdmin(event.target.value);
   };
-
-  const communityId = 0;
 
   return (
     <div>
@@ -70,7 +68,7 @@ function AddAdminDialog() {
   );
 }
 
-function RemoveAdminDialog() {
+function RemoveAdminDialog({ communityId }) {
   const [open, setOpen] = React.useState(false);
   const [status, setStatus] = useState(null)
   const [removeAdmin, setRemoveAdmin] = useState('');
@@ -87,7 +85,6 @@ function RemoveAdminDialog() {
     setRemoveAdmin(event.target.value);
   };
 
-  const communityId = 0;
 
   return (
     <div>
@@ -125,7 +122,7 @@ function RemoveAdminDialog() {
 }
 
 
-function AdminsCard(props) {
+function AdminsCard({ communityId }) {
   const [communityHead, setCommunityHead] = useState('')
   const [items, setItems] = useState([]);
   const { api } = useSubstrateState();
@@ -134,8 +131,6 @@ function AdminsCard(props) {
   useEffect(() => {
     const fetchCommunityAdmins = async () => {
       if (!api) return; // Ensure the API is set before fetching
-
-      const communityId = 0;
 
       try {
         const allKeys = await api.query.communities.admins.keys(communityId);
@@ -150,7 +145,7 @@ function AdminsCard(props) {
     };
 
     fetchCommunityAdmins();
-  }, [api]);
+  }, [api, communityId]);
 
   useEffect(() => {
     const fetchCommunityHead = async () => {
@@ -159,7 +154,6 @@ function AdminsCard(props) {
         return;
       } // Ensure the API is set before fetching
 
-      const communityId = 0;
 
       try {
         const result = await api.query.communities.communities(communityId);
@@ -180,7 +174,7 @@ function AdminsCard(props) {
     };
 
     fetchCommunityHead();
-  }, [api]);
+  }, [api, communityId]);
 
 
 

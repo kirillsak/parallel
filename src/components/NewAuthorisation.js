@@ -87,6 +87,8 @@ function AuthComponent2() {
         `http://localhost:3001/getAddress/${username}`
       )
 
+      console.log('All key pairs after logging in', JSON.stringify(keyring.getPairs()));
+
       setCurrentAccount(response2.data.address);
 
     } catch (error) {
