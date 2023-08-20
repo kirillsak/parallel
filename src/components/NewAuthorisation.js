@@ -105,6 +105,8 @@ function AuthComponent2() {
     const { pair, json } = keyring.addUri(newMnemonic, 'myStr0ngP@ssworD', { name: username });
     console.log(json);
 
+    console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
+
     const address = pair.address;
     setAddress(address);
     setMnemonic(newMnemonic);

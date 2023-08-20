@@ -74,8 +74,6 @@ function SupplyCard(props) {
 
   useEffect(() => {
     const fetchSupply = async () => {
-      console.log("Fetching supply... for ", api);
-
       if (!api) return; // Ensure the API is set before fetching
 
       const assetId = 0;
