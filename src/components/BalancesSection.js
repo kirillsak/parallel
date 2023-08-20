@@ -56,7 +56,6 @@ function BalancesSection() {
     }
   }, [loggedInUser, userDetails]);
 
-
   return (
     <Stack spacing={2} padding={1} direction="row">
       <Card
@@ -78,7 +77,8 @@ function BalancesSection() {
             component="h1"
             sx={{ fontSize: '2rem', color: 'black' }}
           >
-            {loggedInUser ? userDetails.firstName + " Balances" : 'Login to see Balance'}
+            {/* {loggedInUser ? userDetails.firstName + " Balances" : 'Login to see Balance'} */}
+            {loggedInUser ? "Balances" : 'Login to see Balance'}
           </Typography>
         </Box>
       </Card>
