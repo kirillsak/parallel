@@ -81,7 +81,7 @@ function BalancesSection() {
       <Box>
         <Grid container spacing={2}>
           <Grid item>
-            <NativeBalanceCard address={currentAccount} />
+            <NativeBalanceCard />
           </Grid>
           {assetIds.map((assetId) => (
             balances[assetId] && balances[assetId] > 0 ? (

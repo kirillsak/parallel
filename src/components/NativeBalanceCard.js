@@ -57,12 +57,12 @@ function Body({ balance, tokenAbbreviation }) {
   );
 }
 
-function NativeBalanceCard({ accountId }) {
+function NativeBalanceCard({ address }) {
   const [balance, setBalance] = useState(null);
   const { api, currentAccount } = useSubstrateState();
 
   // Uses the account ID from props if present, otherwise uses the current account
-  const effectiveAccountId = accountId || currentAccount;
+  const effectiveAccountId = address || currentAccount;
 
   console.log("effectiveAccountId", effectiveAccountId);
 
