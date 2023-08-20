@@ -7,7 +7,7 @@ import { useSubstrateState } from '../substrate-lib'
 import { useUser } from './UserContext'
 
 function BalancesSection() {
-  const { loggedInUser } = useUser()
+  const { loggedInUser, userDetails } = useUser()
   const { api, currentAccount } = useSubstrateState()
   const [assetIds, setAssetIds] = useState([]);
   const [balances, setBalances] = useState({});
@@ -50,6 +50,12 @@ function BalancesSection() {
     fetchAssets();
   }, [api, currentAccount]);
 
+  useEffect(() => {
+    if (loggedInUser) {
+      console.log(userDetails);
+    }
+  }, [loggedInUser, userDetails]);
+
 
   return (
     <Stack spacing={2} padding={1} direction="row">
@@ -72,9 +78,7 @@ function BalancesSection() {
             component="h1"
             sx={{ fontSize: '2rem', color: 'black' }}
           >
-            {loggedInUser
-              ? "Balances"
-              : 'Login to see Balance'}
+            {loggedInUser ? userDetails.firstName + " Balances" : 'Login to see Balance'}
           </Typography>
         </Box>
       </Card>
