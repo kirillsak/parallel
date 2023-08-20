@@ -35,6 +35,7 @@ import BalancesSection from './components/BalancesSection'
 import TreasuryBalancesSection from './components/TreasuryBalancesSection';
 import AdminsCard from './components/AdminsCard';
 import AuthComponent2 from './components/NewAuthorisation';
+import CommunitySelector from './components/CommunitySelector.js';
 
 
 const drawerWidth = 160;
@@ -122,21 +123,9 @@ function Main() {
   const { apiState, apiError, keyringState } = useSubstrateState()
   const [open, setOpen] = useState(true);
   const [dashboardView, setDashboardView] = useState('user');
-  // const [adminCommunities, setAdminCommunities] = useState([]);
-  // const [selectedCommunity, setSelectedCommunity] = useState(null);
   const toggleDrawer = () => {
     setOpen(!open);
   };
-
-  // const [signUpOpen, setSignUpOpen] = useState(false);
-  // // const [logInOpen, setLogInOpen] = useState(false);
-  // const handleClickSignUpOpen = () => {
-  //   setSignUpOpen(true);
-  // };
-
-  // const handleSignUpClose = () => {
-  //   setSignUpOpen(false);
-  // };
 
   const loader = text => (
     <Dimmer active>
@@ -247,6 +236,7 @@ function Main() {
 
             {dashboardView === 'admin' && (
               <>
+                <CommunitySelector />
                 <SupplyCard />
                 <TreasuryBalancesSection />
                 <AdminsCard />
