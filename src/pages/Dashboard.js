@@ -27,13 +27,18 @@ import { useState } from 'react';
 
 import { useSubstrateState } from '../substrate-lib'
 import { DeveloperConsole } from '../substrate-lib/components'
-// import { UserProvider } from '../components/UserContext'
-// import Interactor from './Interactor'
 import AuthComponent2 from '../components/NewAuthorisation';
 import AdminDashboard from '../components/AdminDashboard';
 import { CommunityProvider } from '../components/CommunityContext';
-import { mainListItems } from '../components/listItems';
 import UserDashboard from '../components/UserDashboard';
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import DashboardIcon from '@mui/icons-material/Dashboard'
+import NewReleasesIcon from '@mui/icons-material/NewReleases'
+import Diversity3Icon from '@mui/icons-material/Diversity3'
+import NaturePeopleIcon from '@mui/icons-material/NaturePeople'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 
 const drawerWidth = 160;
 
@@ -110,6 +115,18 @@ const defaultTheme = createTheme({
         MuiInputBase: {
             input: {
                 color: 'black',
+            },
+        },
+    },
+    components: {
+        MuiListItemButton: {
+            styleOverrides: {
+                root: {
+                    '&.Mui-selected': {  // This targets the `selected` state of ListItemButton
+                        backgroundColor: '#171717', // This is just an example: semi-transparent red
+                        // Add other styles here as needed
+                    },
+                },
             },
         },
     },
@@ -211,7 +228,36 @@ function Dashboard() {
                             </Toolbar>
                             <Divider />
                             <List component="nav">
-                                {mainListItems}
+                                <ListItemButton selected={true} style={{ paddingRight: '-16px', borderRadius: '50px' }}>
+                                    <ListItemIcon style={{ marginRight: '-16px' }}>
+                                        <DashboardIcon style={{ color: 'white' }} />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Dashboard" />
+                                </ListItemButton>
+                                <ListItemButton>
+                                    <ListItemIcon style={{ marginRight: '-16px' }}>
+                                        <NewReleasesIcon style={{ color: 'white' }} />
+                                    </ListItemIcon>
+                                    <ListItemText primary="New" />
+                                </ListItemButton>
+                                <ListItemButton>
+                                    <ListItemIcon style={{ marginRight: '-16px' }}>
+                                        <Diversity3Icon style={{ color: 'white' }} />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Communities" />
+                                </ListItemButton>
+                                <ListItemButton>
+                                    <ListItemIcon style={{ marginRight: '-16px' }}>
+                                        <NaturePeopleIcon style={{ color: 'white' }} />
+                                    </ListItemIcon>
+                                    <ListItemText primary="People" />
+                                </ListItemButton>
+                                <ListItemButton>
+                                    <ListItemIcon style={{ marginRight: '-16px' }}>
+                                        <SwapHorizIcon style={{ color: 'white' }} />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Transfer" />
+                                </ListItemButton>
                                 <Divider sx={{ my: 1 }} />
                                 {/* {secondaryListItems} */}
                             </List>
