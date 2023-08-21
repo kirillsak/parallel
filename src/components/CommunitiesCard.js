@@ -12,6 +12,7 @@ import ListItemText from "@mui/material/ListItemText";
 // import Stack from "@mui/material/Stack";
 import { useCommunity } from "./CommunityContext";
 import { hexToString } from '@polkadot/util';
+import { Link } from "react-router-dom";
 
 
 
@@ -39,14 +40,16 @@ function CommunitiesCard() {
                 <Divider sx={{ backgroundColor: "#2F2F2F", margin: 2 }} />
                 <List>
                     {allCommunities.map((community, index) => (
-                        <ListItemButton key={index} sx={{ borderRadius: '50px' }}>
-                            <ListItemAvatar>
-                                <Avatar>
-                                    <FolderIcon />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={hexToString(community.name)} />
-                        </ListItemButton>
+                        <Link to={`/community/${community.id}`}>
+                            <ListItemButton key={community.id} sx={{ borderRadius: '50px' }}>
+                                <ListItemAvatar>
+                                    <Avatar>
+                                        <FolderIcon />
+                                    </Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary={hexToString(community.name)} />
+                            </ListItemButton>
+                        </Link>
                     ))}
                 </List>
             </Box>
