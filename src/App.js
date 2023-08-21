@@ -24,13 +24,13 @@ import { mainListItems } from './components/listItems';
 import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
 import { useState } from 'react';
+import UserDashboard from './components/UserDashboard';
 
 
 import { SubstrateContextProvider, useSubstrateState } from './substrate-lib'
 import { DeveloperConsole } from './substrate-lib/components'
 import { UserProvider } from './components/UserContext'
 // import Interactor from './Interactor'
-import BalancesSection from './components/BalancesSection'
 import AuthComponent2 from './components/NewAuthorisation';
 import AdminDashboard from './components/AdminDashboard';
 import { CommunityProvider } from './components/CommunityContext';
@@ -229,7 +229,9 @@ function Main() {
             <Toolbar />
             {dashboardView === 'user' && (
               <>
-                <BalancesSection />
+                <CommunityProvider>
+                  <UserDashboard />
+                </CommunityProvider>
               </>
             )}
 

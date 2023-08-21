@@ -14,6 +14,32 @@ export const CommunityProvider = ({ children }) => {
     const [communityHead, setCommunityHead] = useState('')
     const [admins, setAdmins] = useState([]);
     const { api } = useSubstrateState();
+    const [allCommunities, setAllCommunities] = useState([]);
+
+    useEffect(() => {
+        const fetchAllCommunities = async () => {
+            if (!api) return;
+
+            try {
+                const nextCommunityId = await api.query.communities.nextCommunityId();
+                console.log("Next community ID:", nextCommunityId.toNumber());
+
+                let communities = [];
+
+                for (let i = 0; i < nextCommunityId.toNumber(); i++) {
+                    const community = await api.query.communities.communities(i);
+                    communities.push(community.toJSON());
+                }
+
+                setAllCommunities(communities);
+            } catch (error) {
+                console.error("Error fetching all communities:", error);
+            }
+        };
+
+        fetchAllCommunities();
+    }, [api]);
+
 
     useEffect(() => {
         const fetchCommunityAdmins = async () => {
@@ -69,7 +95,9 @@ export const CommunityProvider = ({ children }) => {
         admins,
         setAdmins,
         communityHead,
-        setCommunityHead
+        setCommunityHead,
+        allCommunities,
+        setAllCommunities,
     };
     return (
         <CommunityContext.Provider value={contextValue}>{children}</CommunityContext.Provider>

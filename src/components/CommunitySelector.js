@@ -18,9 +18,11 @@ function CommunitySelector() {
     const {
         currentAccount,
     } = useSubstrateState();
-    const [communitiesInfo, setCommunitiesInfo] = useState([]);
+    const [adminCommunities, setAdminCommunities] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
-    const { selectedCommunity, setSelectedCommunity } = useCommunity();
+    const { selectedCommunity, setSelectedCommunity, allCommunities } = useCommunity();
+
+
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -35,44 +37,36 @@ function CommunitySelector() {
         handleClose();
     };
 
+
     useEffect(() => {
-        const fetchCommunityAdmins = async () => {
-            if (!api) return;
+        const fetchAdminCommunities = async () => {
+            if (!api || !allCommunities.length) return;
 
             try {
-
-                const nextCommunityId = await api.query.communities.nextCommunityId();
-
-                console.log("Next community ID:", nextCommunityId.toNumber());
-
                 let communitiesInfo = [];
 
-                for (let i = 0; i < nextCommunityId.toNumber(); i++) {
-                    const isAdmin = await api.query.communities.admins(i, currentAccount);
+                for (let community of allCommunities) {
+                    const isAdmin = await api.query.communities.admins(community.id, currentAccount);
                     if (isAdmin.isSome) {
-                        const community = await api.query.communities.communities(i);
-                        communitiesInfo.push(community.toJSON());
+                        communitiesInfo.push(community);
                     }
                 }
 
                 console.log("Community IDs for admin:", JSON.stringify(communitiesInfo));
-                console.log(currentAccount)
-                setCommunitiesInfo(communitiesInfo);
-
-
+                setAdminCommunities(communitiesInfo);
             } catch (error) {
-                console.error("Error fetching community admins (community selector):", error);
+                console.error("Error fetching communities for admin:", error);
             }
         };
 
-        fetchCommunityAdmins();
-    }, [api, currentAccount]);
+        fetchAdminCommunities();
+    }, [api, currentAccount, allCommunities]);
 
 
 
     return (
         <div>
-            {communitiesInfo.length === 0 ? (
+            {adminCommunities.length === 0 ? (
                 <p>You are not an admin in any communities.</p>
             ) : (
                 <>
@@ -92,7 +86,7 @@ function CommunitySelector() {
                         open={Boolean(anchorEl)}
                         onClose={handleClose}
                     >
-                        {communitiesInfo.map(community => (
+                        {adminCommunities.map(community => (
                             <MenuItem
                                 key={community.id}
                                 onClick={() => handleMenuItemClick(community)}
