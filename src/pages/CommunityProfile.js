@@ -1,6 +1,6 @@
-import React, { createRef } from 'react'
+import React, { createRef, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
-import { CommunityProvider } from '../components/CommunityContext';
+import { CommunityProvider, useCommunity } from '../components/CommunityContext';
 import {
     Dimmer,
     Loader,
@@ -24,6 +24,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Card from '@mui/material/Card';
 import { useState } from 'react';
+// import {  } from './CommunityContext';
 
 
 import { useSubstrateState } from '../substrate-lib'
@@ -133,11 +134,27 @@ const defaultTheme = createTheme({
 
 function Main() {
     const { communityId } = useParams();
+    const { selectedCommunity, setSelectedCommunity, allCommunities } = useCommunity();
     const { apiState, apiError, keyringState } = useSubstrateState()
     const [open, setOpen] = useState(true);
     const toggleDrawer = () => {
         setOpen(!open);
     };
+
+    useEffect(() => {
+        // This function fetches the community by its ID and updates the state.
+        const fetchAndSetCommunity = async () => {
+            // Find the community from the 'allCommunities' state by its ID.
+            const community = allCommunities.find(com => com.id === communityId);
+
+            // If the community is found and it's different from the currently selected one, update the state.
+            if (community && (!selectedCommunity.id || selectedCommunity.id !== communityId)) {
+                setSelectedCommunity(community);
+            }
+        };
+
+        fetchAndSetCommunity();
+    }, [communityId, selectedCommunity, allCommunities, setSelectedCommunity]);
 
     const loader = text => (
         <Dimmer active>
@@ -271,6 +288,7 @@ function Main() {
                             <Toolbar />
                             <div>
                                 Profile for community: {communityId}
+                                Community details: {JSON.stringify(selectedCommunity)}
                                 {/* Render your community details here */}
                             </div>
                         </Box>
