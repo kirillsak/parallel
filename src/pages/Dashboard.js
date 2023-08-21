@@ -39,6 +39,8 @@ import NewReleasesIcon from '@mui/icons-material/NewReleases'
 import Diversity3Icon from '@mui/icons-material/Diversity3'
 import NaturePeopleIcon from '@mui/icons-material/NaturePeople'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import { Link } from "react-router-dom";
+
 
 const drawerWidth = 160;
 
@@ -228,12 +230,14 @@ function Dashboard() {
                             </Toolbar>
                             <Divider />
                             <List component="nav">
-                                <ListItemButton selected={true} style={{ paddingRight: '-16px', borderRadius: '50px' }}>
-                                    <ListItemIcon style={{ marginRight: '-16px' }}>
-                                        <DashboardIcon style={{ color: 'white' }} />
-                                    </ListItemIcon>
-                                    <ListItemText primary="Dashboard" />
-                                </ListItemButton>
+                                <Link to={`/`}>
+                                    <ListItemButton selected={true} style={{ paddingRight: '-16px', borderRadius: '50px' }}>
+                                        <ListItemIcon style={{ marginRight: '-16px' }}>
+                                            <DashboardIcon style={{ color: 'white' }} />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Dashboard" />
+                                    </ListItemButton>
+                                </Link>
                                 <ListItemButton>
                                     <ListItemIcon style={{ marginRight: '-16px' }}>
                                         <NewReleasesIcon style={{ color: 'white' }} />
@@ -285,7 +289,6 @@ function Dashboard() {
                                     <CommunityProvider>
                                         <AdminDashboard />
                                     </CommunityProvider>
-
                                 </>
                             )}
                         </Box>
