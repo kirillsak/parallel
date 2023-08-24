@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useCallback } from 'react'
+import axios from 'axios'
 // import { Keyring } from "@polkadot/keyring";
 import { mnemonicGenerate } from '@polkadot/util-crypto'
 import { useUser } from './UserContext'
@@ -29,17 +29,15 @@ function AuthComponent2() {
   const [mnemonic, setMnemonic] = useState('')
   const [message, setMessage] = useState('')
   const { loggedInUser, setLoggedInUser } = useUser()
-  // const { loggedInUser, setLoggedInUser, profileImage, setProfileImage } =
-  //   useUser()
   const [openDialog, setOpenDialog] = useState(false)
   const [dialogType, setDialogType] = useState('login') // 'login' or 'signup'
   const [isLoggedIn, setIsLoggedIn] = useState(!!storedUser)
   const [anchorEl, setAnchorEl] = useState(null)
 
-  // const storedProfilePicture = sessionStorage.getItem('profilePicture')
-  // const [profilePicture, setProfilePicture] = useState(
-  //   storedProfilePicture || null
-  // )
+  const storedProfilePicture = sessionStorage.getItem('profilePicture')
+  const [profilePicture, setProfilePicture] = useState(
+    storedProfilePicture || null
+  )
 
   const {
     setCurrentAccount,
@@ -47,9 +45,9 @@ function AuthComponent2() {
   } = useSubstrate()
 
   // Opens the dropdown menu from the avatar button
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget)
+  }
 
   // Closes the dropdown menu
   const handleClose = () => {
@@ -57,67 +55,77 @@ function AuthComponent2() {
   }
 
   const handleOpenLogin = () => {
-    setDialogType('login');
-    setOpenDialog(true);
-  };
+    setDialogType('login')
+    setOpenDialog(true)
+  }
 
   const handleOpenSignup = () => {
-    setDialogType('signup');
-    setOpenDialog(true);
-  };
+    setDialogType('signup')
+    setOpenDialog(true)
+  }
 
   const handleLogin = async () => {
     try {
       // Sending the username and password to a login endpoint
-      const response = await axios.post("http://localhost:3001/login", {
+      const response = await axios.post('http://localhost:3001/login', {
         username,
         password,
       })
       setLoggedInUser(username)
       setIsLoggedIn(true) // Update the logged-in state
-      sessionStorage.setItem("loggedInUser", username);
+      sessionStorage.setItem('loggedInUser', username)
       setMessage(response.data.message)
 
-      // const profilePicResponse = await axios.get(
-      //   `http://localhost:3001/getProfilePic/${username}`
-      // )
-      // setProfilePicture(profilePicResponse.data.profilePic)
+      const profilePicResponse = await axios.get(
+        `http://localhost:3001/getProfilePic/${username}`
+      )
+      const completeImageUrl =
+        'http://localhost:3001' + profilePicResponse.data.profilePic // Assuming the backend responds with a relative path
+      setProfilePicture(completeImageUrl) // Update state
+      sessionStorage.setItem('profilePicture', completeImageUrl) // Update the session
 
       const response2 = await axios.get(
         `http://localhost:3001/getAddress/${username}`
       )
 
-      console.log('All key pairs after logging in', JSON.stringify(keyring.getPairs()));
+      console.log(
+        'All key pairs after logging in',
+        JSON.stringify(keyring.getPairs())
+      )
 
-      setCurrentAccount(response2.data.address);
-
+      setCurrentAccount(response2.data.address)
     } catch (error) {
       setMessage(error.response.data.message)
     }
   }
 
   const handleCreate = () => {
-    const account = createAccount();
-    setAccountInfo(account);
-    setInitiateSignup(true);
-  };
+    const account = createAccount()
+    setAccountInfo(account)
+    setInitiateSignup(true)
+  }
 
   const createAccount = () => {
-    const newMnemonic = mnemonicGenerate();
-    const { pair, json } = keyring.addUri(newMnemonic, 'myStr0ngP@ssworD', { name: username });
-    console.log(json);
+    const newMnemonic = mnemonicGenerate()
+    const { pair, json } = keyring.addUri(newMnemonic, 'myStr0ngP@ssworD', {
+      name: username,
+    })
+    console.log(json)
 
-    console.log('All key pairs after adding', JSON.stringify(keyring.getPairs()));
+    console.log(
+      'All key pairs after adding',
+      JSON.stringify(keyring.getPairs())
+    )
 
-    const address = pair.address;
-    setAddress(address);
-    setMnemonic(newMnemonic);
-    return { address, mnemonic: newMnemonic, name: pair.meta.name };
-  };
+    const address = pair.address
+    setAddress(address)
+    setMnemonic(newMnemonic)
+    return { address, mnemonic: newMnemonic, name: pair.meta.name }
+  }
 
   const handleSignup = useCallback(async () => {
     try {
-      const response = await axios.post("http://localhost:3001/register", {
+      const response = await axios.post('http://localhost:3001/register', {
         username,
         firstName,
         lastName,
@@ -125,74 +133,71 @@ function AuthComponent2() {
         password,
         address,
         mnemonic,
-      });
-      setMessage(response.data.message);
+      })
+      setMessage(response.data.message)
     } catch (error) {
-      setMessage(error.response.data.message);
+      setMessage(error.response.data.message)
     }
-  }, [username, firstName, lastName, email, password, address, mnemonic]);
+  }, [username, firstName, lastName, email, password, address, mnemonic])
 
-  // const handleUploadClick = e => {
-  //   const input = document.getElementById('profile-picture-upload')
-  //   input.click()
-  // }
+  const handleUploadClick = e => {
+    const input = document.getElementById('profile-picture-upload')
+    input.click()
+  }
 
-  // const handleProfilePictureChange = async e => {
-  //   const file = e.target.files[0]
-  //   setProfilePicture(URL.createObjectURL(file))
+  const handleProfilePictureChange = async e => {
+    const file = e.target.files[0]
 
-  //   const formData = new FormData()
-  //   formData.append('profilePic', file)
+    const formData = new FormData()
+    formData.append('profilePic', file)
 
-  //   formData.append('username', username)
+    formData.append('username', username)
 
-  //   try {
-  //     const response = await axios.post(
-  //       'http://localhost:3001/uploadProfilePic',
-  //       formData,
-  //       {
-  //         headers: {
-  //           'Content-Type': 'multipart/form-data',
-  //         },
-  //       }
-  //     )
+    try {
+      const response = await axios.post(
+        'http://localhost:3001/uploadProfilePic',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
 
-  //     // The backend responds with the saved image's URL or relative path.
+      // The backend responds with the saved image's URL or relative path.
 
-  //     // Save this imageUrl to the user's state:
-  //     const backendURL = 'http://localhost:3001' // or wherever your backend is hosted
-  //     const completeImageUrl = backendURL + response.data.imageUrl
-  //     setProfileImage(completeImageUrl) // Update the context
-  //     sessionStorage.setItem('profilePicture', completeImageUrl) // Update the sessionStorage
-  //     setProfilePicture(completeImageUrl)
-  //   } catch (error) {
-  //     console.log('Failed to upload image:', error)
-  //   }
-  // }
-
+      // Save this imageUrl to the user's state:
+      const backendURL = 'http://localhost:3001' // or wherever your backend is hosted
+      const completeImageUrl = backendURL + response.data.imageUrl
+      setProfilePicture(completeImageUrl)
+      sessionStorage.setItem('profilePicture', completeImageUrl) // Update the sessionStorage
+    } catch (error) {
+      console.log('Failed to upload image:', error)
+    }
+  }
 
   useEffect(() => {
     if (initiateSignup) {
-      handleSignup();
-      setInitiateSignup(false);
+      handleSignup()
+      setInitiateSignup(false)
     }
-  }, [initiateSignup, handleSignup]);
-
-
+  }, [initiateSignup, handleSignup])
 
   const handleSignOut = () => {
     // Reset the user's state
-    setUsername("");
-    setEmail("");
-    setPassword("");
-    setAddress("");
-    setMnemonic("");
-    setMessage("");
-    setLoggedInUser(null); // assuming the useUser context handles this appropriately
-    setIsLoggedIn(false);
-    setCurrentAccount(null);
-    sessionStorage.removeItem("loggedInUser");
-    handleClose(); // close the dropdown menu
+    setUsername('')
+    setEmail('')
+    setPassword('')
+    setAddress('')
+    setMnemonic('')
+    setMessage('')
+    setLoggedInUser(null) // assuming the useUser context handles this appropriately
+    setIsLoggedIn(false)
+    setCurrentAccount(null)
+    sessionStorage.removeItem('loggedInUser')
+    handleClose() // close the dropdown menu
+    sessionStorage.removeItem('profilePicture')
+    setProfilePicture(null)
 
     window.location.reload()
   }
@@ -202,13 +207,8 @@ function AuthComponent2() {
       {isLoggedIn ? (
         <div>
           <IconButton onClick={handleClick}>
-            {/* <Avatar src={profilePicture || profileImage}>
-              {!profileImage && !profilePicture
-                ? loggedInUser.charAt(0).toUpperCase()
-                : null}
-            </Avatar> */}
-            <Avatar>
-              {loggedInUser.charAt(0).toUpperCase()}
+            <Avatar src={profilePicture}>
+              {!profilePicture ? loggedInUser.charAt(0).toUpperCase() : null}
             </Avatar>
           </IconButton>
           <Menu
@@ -216,7 +216,7 @@ function AuthComponent2() {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            {/* <MenuItem onClick={handleUploadClick} sx={{ color: 'black' }}>
+            <MenuItem onClick={handleUploadClick} sx={{ color: 'black' }}>
               <input
                 type="file"
                 style={{ display: 'none' }}
@@ -226,7 +226,7 @@ function AuthComponent2() {
               <label htmlFor="profile-picture-upload">
                 Upload Profile Picture
               </label>
-            </MenuItem> */}
+            </MenuItem>
             <MenuItem onClick={handleSignOut} sx={{ color: 'black' }}>
               <Button variant="outlined" color="primary">
                 Sign Out
@@ -257,12 +257,14 @@ function AuthComponent2() {
       <Dialog
         open={openDialog}
         onClose={() => {
-          setOpenDialog(false);
-          setMessage('');
-          setAccountInfo({});
+          setOpenDialog(false)
+          setMessage('')
+          setAccountInfo({})
         }}
       >
-        <DialogTitle style={{ color: 'black' }}>{dialogType === 'login' ? 'Login' : 'Signup'}</DialogTitle>
+        <DialogTitle style={{ color: 'black' }}>
+          {dialogType === 'login' ? 'Login' : 'Signup'}
+        </DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -330,11 +332,9 @@ function AuthComponent2() {
               </strong>
             </div>
           )}
-
         </DialogContent>
       </Dialog>
     </div>
-
   )
 }
 
